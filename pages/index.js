@@ -1,22 +1,14 @@
-import { useQuery } from '@apollo/client';
-import { GET_USERS } from './graphql/queries';
+import { useUser } from './lib/auth';
 
 export default function Home() {
-  const { loading, error, data } = useQuery(GET_USERS);
+  const user = useUser();
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (!user) return <p>Loading...</p>;
 
   return (
     <div>
-      <h1 style={{ color: '#333' }}>Users</h1>
-      <ul>
-        {data.users.map((user) => (
-          <li key={user.id}>
-            {user.username} - {user.email}
-          </li>
-        ))}
-      </ul>
+      <h1>Welcome, {user.email}</h1>
+      {/* 추가적인 사용자 정보나 기능을 여기에 추가 */}
     </div>
   );
 }

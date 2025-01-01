@@ -1,0 +1,7 @@
+{
+    "name": "my-project",
+    "remoteEnv": {
+      "SUPABASE_URL": "${SUPABASE_URL}",
+      "SUPABASE_KEY": "${SUPABASE_KEY}"
+    }
+  }
