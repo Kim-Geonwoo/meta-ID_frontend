@@ -10,10 +10,10 @@ export default function Logout() {
   useEffect(() => {
     const logout = async () => {
       await signOut(auth);
-      router.push('/');
+      router.push('/'); // 로그아웃 후, 메인페이지로 자동이동.
     };
     logout();
   }, [router]);
 
-  return <p>Logging out...</p>;
+  return <p>로그아웃 중...</p>;
 }

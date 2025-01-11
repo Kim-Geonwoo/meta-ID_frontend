@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useUser } from './lib/auth';
-import { encrypt } from './lib/crypto'; // 경로 수정
+import { encrypt } from './lib/crypto';
 
 interface Service {
   name: string;
@@ -46,8 +46,8 @@ const MyServices = () => {
 
   return (
     <div>
-      <h1>My Services</h1>
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+      <h1>나의 서비스들</h1>
+      {error && <p style={{ color: 'red' }}>오류발생: {error}</p>}
       {services.length === 0 ? (
         <div>
           <p>아직 서비스가 없습니다</p>

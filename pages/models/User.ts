@@ -1,3 +1,4 @@
+// 유저 모델 정의
 import mongoose, { Schema, models } from "mongoose";
 
 export const userSchema = new Schema({
@@ -20,7 +21,7 @@ export const userSchema = new Schema({
     required: true,
     unique: true,
   },
-  services: [{
+  services: [{ // 무슨 이유인지, 작동하지 않음,.
     type: Schema.Types.ObjectId,
     ref: 'Service',
   }],

@@ -13,7 +13,7 @@ export default function Login() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/'); // 로그인 후 홈 페이지로 리디렉션
+      router.push('/'); // 로그인 후, 메인페이지로 자동이동.
     } catch (error: any) {
       alert(error.message);
     }
@@ -21,19 +21,19 @@ export default function Login() {
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>로그인 페이지</h1>
       <form onSubmit={handleLogin}>
         <label>
-          Email:
+          이메일:
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <br />
         <label>
-          Password:
+          비밀번호:
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         <br />
-        <button type="submit">Login</button>
+        <button type="submit">로그인</button>
       </form>
     </div>
   );

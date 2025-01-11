@@ -1,10 +1,10 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { auth } from './lib/firebaseClient';
 
-// 랜덤한 6자리 문자열 생성 함수
+// 유저 고유ID를 위한, 랜덤 문자열 생성 함수.
 function RandomId(length) {
   const chars = 'abcdefghijklmnopqrstuvwxyz';
   let result = '';
@@ -18,7 +18,7 @@ const SignUp = () => {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [dbError, setDbError] = useState('');
+  const [dbError] = useState('');
   const router = useRouter();
 
 
@@ -32,7 +32,7 @@ const SignUp = () => {
         await updateProfile(user, {
           displayName: userName,
         });
-        const userRandomId = RandomId(6);
+        const userRandomId = RandomId(6); // 유저 고유ID를 위한, 문자열 길이는 6자리.
         const response = await fetch('/api/createuser', {
           method: 'POST',
           headers: {
@@ -46,11 +46,11 @@ const SignUp = () => {
         });
 
         if (response.ok) {
-          alert('Sign up successful! Redirecting to login page...');
-          router.push('/login'); // 회원가입 성공 후 로그인 페이지로 리디렉션
+          alert('회원가입이 완료되었습니다! 로그인페이지로 이동합니다.');
+          router.push('/login'); // 회원가입 성공 후, 로그인페이지로 자동이동.
         } else {
           const data = await response.json();
-          alert(`Error: ${data.error}`);
+          alert(`회원가입 중, 오류발생: ${data.error}`);
         }
       }
     } catch (error: any) {
@@ -60,28 +60,28 @@ const SignUp = () => {
 
   return (
     <div>
-      <h1>Sign Up</h1>
-      {dbError && <p style={{ color: 'red' }}>Database connection error: {dbError}</p>}
+      <h1>회원가입 페이지</h1>
+      {dbError && <p style={{ color: 'red' }}>데이터베이스 연결오류 발생: {dbError}</p>}
       <form onSubmit={handleSignUp}>
         <input
           type="text"
-          placeholder="Username"
+          placeholder="사용자 이름"
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
         />
         <input
           type="email"
-          placeholder="Email"
+          placeholder="이메일"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Sign Up</button>
+        <button type="submit">회원가입</button>
       </form>
     </div>
   );

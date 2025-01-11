@@ -1,5 +1,5 @@
-// lib/r2.js
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+// 클라우드플레어 R2 파일 업로드를 위한, 초기화 코드파일,.
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'; // npm 패키지 미설치.
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 

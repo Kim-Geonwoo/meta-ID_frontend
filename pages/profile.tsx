@@ -13,14 +13,14 @@ export default function Profile() {
 
   return (
     <div>
-      <h1>Profile</h1>
+      <h1>유저 프로필</h1>
       {user ? (
         <>
-          <p>Username: {user.username}</p>
-          <p>Email: {user.email}</p>
+          <p>유저이름: {user.username}</p>
+          <p>이메일: {user.email}</p>
         </>
       ) : (
-        <p>Loading...</p>
+        <p>먼저 로그인이 필요합니다.</p>
       )}
     </div>
   );

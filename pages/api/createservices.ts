@@ -1,9 +1,10 @@
+// 서비스 생성시, 새로운 폴더를 생성 및 샘플폴더 내에서 파일복사,. 그리고, DB에 서비스 정보를 저장하는 API 코드파일.
 import fs from 'fs';
 import path from 'path';
-import { encrypt } from '../lib/crypto'; // 경로 수정
 import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from '../lib/mongoose';
 import Service from '../models/Service';
+
 
 // 임의의 영소문자 및 숫자 6자리로 조합된 폴더 이름 생성 함수
 function generateRandomFolderName(): string {
@@ -15,6 +16,7 @@ function generateRandomFolderName(): string {
   return result;
 }
 
+// 임의의 영소문자 및 숫자 8자리로 조합된 서비스 ID 생성 함수
 function generateRandomServiceId(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz';
   let result = '';
@@ -38,6 +40,7 @@ function copyFiles(src: string, dest: string) {
   }
 }
 
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await connectDB();
 
@@ -45,14 +48,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { userId, name, description } = req.body;
 
     try {
+      // 폴더지정
       const srcFolder = path.join(process.cwd(), 'public', 'sampleservice');
+      
       const shortUrl = generateRandomFolderName();
       const serviceId = generateRandomServiceId();
+
+      // 서비스 폴더 생성
       const destFolder = path.join(process.cwd(), 'public', shortUrl);
+
 
       const encryptedId = userId;
       copyFiles(srcFolder, destFolder);
       
+      // 서비스 정보를 DB에 저장
       const newService = new Service({
         serviceId,
         name,
@@ -63,12 +72,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await newService.save();
 
-      res.status(200).json({ message: 'Files copied successfully', shortUrl });
+
+      res.status(200).json({ message: '서비스 생성완료!', shortUrl });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
     }
   } else {
     res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(405).end(`메서드 ${req.method} 이(가) 허용되지 않음`);
   }
 }

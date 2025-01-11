@@ -1,3 +1,4 @@
+// 서비스 모델 정의
 import mongoose, { Schema, models } from "mongoose";
 
 export const serviceSchema = new Schema({
@@ -28,7 +29,7 @@ export const serviceSchema = new Schema({
     type: String,
     required: true,
   },
-  UserId: {
+  UserId: { // 무슨 이유인지, 작동하지 않음,.
     type: Schema.Types.ObjectId,
     ref: 'User',
   },

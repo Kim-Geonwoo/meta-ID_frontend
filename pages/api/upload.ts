@@ -1,9 +1,9 @@
 // pages/api/upload.js
-import { NextRequest, NextResponse } from 'next/server';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+// 추후, 파일 업로드를 위한 API 라우트를 구현필요
+import { PutObjectCommand } from '@aws-sdk/client-s3'; // npm 패키지 미설치.
 import { R2Client } from '../lib/r2client';
 import { auth } from '../lib/firebaseClient';
-import { readdirSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 
 

@@ -1,3 +1,4 @@
+// Layout 컴포넌트
 import Header from './Header';
 import Footer from './Footer';
 

@@ -1,4 +1,4 @@
-
+// 파이어베이스 사용을 위한, Firebase Client 설정 파일.
 import { initializeApp } from 'firebase/app';
 import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -16,13 +16,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+
 // Firebase Auth 상태 지속성 설정
 setPersistence(auth, browserSessionPersistence)
   .then(() => {
-    console.log('Firebase Auth persistence set to session');
+    console.log('파이어베이스 유저 지속성이 성공적으로 설정되었습니다.'); // 추후, 프로덕션시 제거필요.
   })
   .catch((error) => {
-    console.error('Error setting Firebase Auth persistence:', error);
+    console.error('파이어베이스 유저 지속성 세팅중, 오류발생.', error); // 추후, 프로덕션시 제거필요.
   });
 
 const db = getFirestore(app);

@@ -9,8 +9,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Welcome, {user.email}</h1>
-      {/* 추가적인 사용자 정보나 기능을 여기에 추가 */}
+      <h1>환영합니다 사용자님, {user.email}</h1>
       <div>
         <Link href="/createServices">
           <p>서비스 생성 하러가기</p>
