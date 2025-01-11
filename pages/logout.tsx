@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
@@ -9,7 +10,7 @@ export default function Logout() {
   useEffect(() => {
     const logout = async () => {
       await signOut(auth);
-      router.push('/login');
+      router.push('/');
     };
     logout();
   }, [router]);
