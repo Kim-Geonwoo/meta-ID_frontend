@@ -7,11 +7,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   await dbConnect();
 
   if (req.method === 'POST') {
-    const { encryptedUserId } = req.body;
+    const { userId } = req.body;
+
+    
+    // 글자 및 숫자로만 이루어져있는지 검증
+    const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+    if (!alphanumericRegex.test(userId)) {
+      return res.status(400).json({ error: '사용자 ID는 글자 및 숫자로만 이루어져야 합니다.' });
+    }
 
     try {
       // 해당 유저의 서비스 목록 조회 (암호화된 유저 UID로 조회)
-      const services = await Service.find({ encryptedId: encryptedUserId }).select('name description shortUrl createdAt');
+      const services = await Service.find({ encryptedId: { $eq: userId } }).select('name description shortUrl createdAt');
       res.status(200).json(services);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

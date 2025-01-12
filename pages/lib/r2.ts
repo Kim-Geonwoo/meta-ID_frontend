@@ -1,36 +1,23 @@
-// 클라우드플레어 R2 파일 업로드를 위한, 초기화 코드파일,.
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'; // npm 패키지 미설치.
-import { readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { S3Client } from "@aws-sdk/client-s3";
 
-const REGION = 'auto'; // R2는 자동으로 지역을 설정합니다.
-const r2Client = new S3Client({
-  region: REGION,
-  endpoint: process.env.CLOUDFLARE_ENDPOINT,
+
+const API_ROUTE_VALUE = process.env.R2_API_ROUTE_VALUE;
+const ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
+const SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
+const BUCKET_NAME = process.env.R2_BUCKET_NAME;
+
+
+// 클라우드플레어 R2를 위한, S3 클라이언트 생성.
+const S3 = new S3Client({
+  region: "auto",
+  endpoint: `https://${API_ROUTE_VALUE}.r2.cloudflarestorage.com`,
   credentials: {
-    accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY,
-    secretAccessKey: process.env.CLOUDFLARE_SECRET_KEY,
+    accessKeyId: ACCESS_KEY_ID,
+    secretAccessKey: SECRET_ACCESS_KEY,
   },
 });
 
-export const uploadToR2 = async (folderPath, bucketName) => {
-  const files = readdirSync(folderPath);
-  for (const file of files) {
-    const filePath = join(folderPath, file);
-    const fileContent = readFileSync(filePath);
 
-    const params = {
-      Bucket: bucketName,
-      Key: `sampleservice/${file}`,
-      Body: fileContent,
-    };
 
-    const command = new PutObjectCommand(params);
-    try {
-      await r2Client.send(command);
-      console.log(`Uploaded ${file} to ${bucketName}`);
-    } catch (err) {
-      console.error(`Failed to upload ${file}:`, err);
-    }
-  }
-};
+export const R2Client = S3;
+export const BucketName = BUCKET_NAME;
