@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const service = await Service.findOneAndDelete({ _id: ServiceID, encryptedId: userid, shortUrl: ShortUrl });
+      const service = await Service.findOneAndDelete({ _id: { $eq: ServiceID }, encryptedId: { $eq: userid }, shortUrl: { $eq: ShortUrl } });
       if (service) {
         // 서비스 폴더 및 파일 삭제
         const serviceFolderPath = path.join(process.cwd(), 'public', ShortUrl);
