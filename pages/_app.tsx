@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { auth } from './lib/firebaseClient'; // 미사용이지만, 내버려두기로 하였음.
-import { onAuthStateChanged } from 'firebase/auth'; 미사용이지만, 내버려두기로 하였음.
+import { onAuthStateChanged } from 'firebase/auth'; // 미사용이지만, 내버려두기로 하였음.
 import type { AppProps } from 'next/app';
 
 function MyApp({ Component, pageProps }: AppProps) {

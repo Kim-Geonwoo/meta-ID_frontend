@@ -1,13 +1,7 @@
-// pages/api/upload.js
-// 추후, 파일 업로드를 위한 API 라우트를 구현필요
-import { PutObjectCommand } from '@aws-sdk/client-s3'; // npm 패키지 미설치.
-import { R2Client } from '../lib/r2client';
-import { auth } from '../lib/firebaseClient';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { R2Client, BucketName } from '../lib/r2';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-
-
-
 
 const filesToUpload = [
   'index.html',
@@ -19,10 +13,10 @@ const filesToUpload = [
   'contact.json',
 ];
 
-const uploadFile = async (fileContent, fileName) => {
+const uploadFile = async (fileContent, fileName, folderName) => {
   const command = new PutObjectCommand({
-    Bucket: process.env.NEXT_R2_BUCKET_NAME,
-    Key: `sampleservice/${fileName}`,
+    Bucket: `${BucketName}`,
+    Key: `${folderName}/${fileName}`,
     Body: fileContent,
     ContentType: 'application/octet-stream', // 기본 콘텐츠 유형, 필요시 파일별로 수정 가능
   });
@@ -33,15 +27,12 @@ const uploadFile = async (fileContent, fileName) => {
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      const idToken = req.headers.authorization.split('Bearer ')[1];
-      const user = await auth.verifyIdToken(idToken);
-      if (!user) return res.status(401).json({ error: 'Unauthorized' });
-
-      const folderPath = join(process.cwd(), 'public', 'sampleservice');
+      const { folder } = req.body;
+      const folderPath = join(process.cwd(), 'public', folder);
       for (const file of filesToUpload) {
         const filePath = join(folderPath, file);
         const fileContent = readFileSync(filePath);
-        await uploadFile(fileContent, file);
+        await uploadFile(fileContent, file, folder);
       }
 
       return res.status(200).json({ message: 'Files uploaded successfully' });
