@@ -17,11 +17,11 @@ const filesToDelete = [
   'contact.json',
 ];
 
-async function deleteR2Files(shortUrl: string) {
+async function deleteR2Files(ShortUrl: string) {
   try {
     const deleteParams = {
       Bucket: process.env.R2_BUCKET_NAME,
-      Delete: { Objects: filesToDelete.map(file => ({ Key: `${shortUrl}/${file}` })) },
+      Delete: { Objects: filesToDelete.map(file => ({ Key: `${ShortUrl}/${file}` })) },
     };
 
     await R2Client.send(new DeleteObjectsCommand(deleteParams));
@@ -31,23 +31,30 @@ async function deleteR2Files(shortUrl: string) {
   }
 }
 
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await dbConnect();
 
   if (req.method === 'POST') {
-    const { encryptedUserId, serviceId, shortUrl } = req.body;
+    const { userid, ServiceID, ShortUrl } = req.body;
+
+    // 글자 및 숫자로만 이루어져있는지 검증
+    const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+    if (!alphanumericRegex.test(userid) || !alphanumericRegex.test(ServiceID) || !alphanumericRegex.test(ShortUrl)) {
+      return res.status(400).json({ error: '페이로드는 글자 및 숫자로만 이루어져야 합니다.' });
+    }
 
     try {
-      const service = await Service.findOneAndDelete({ _id: serviceId, encryptedId: encryptedUserId, shortUrl });
+      const service = await Service.findOneAndDelete({ _id: ServiceID, encryptedId: userid, shortUrl: ShortUrl });
       if (service) {
         // 서비스 폴더 및 파일 삭제
-        const serviceFolderPath = path.join(process.cwd(), 'public', shortUrl);
+        const serviceFolderPath = path.join(process.cwd(), 'public', ShortUrl);
         if (fs.existsSync(serviceFolderPath)) {
           fs.rmdirSync(serviceFolderPath, { recursive: true });
         }
 
         // R2 파일 삭제
-        await deleteR2Files(shortUrl);
+        await deleteR2Files(ShortUrl);
 
         res.status(200).json({ message: '서비스가 삭제되었습니다.' });
       } else {

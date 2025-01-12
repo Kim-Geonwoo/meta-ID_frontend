@@ -27,7 +27,7 @@ const MyServices = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ encryptedUserId }),
+            body: JSON.stringify({ userId: encryptedUserId }),
           });
 
           if (response.ok) {
@@ -48,7 +48,7 @@ const MyServices = () => {
 
   const handleDeleteService = async (serviceId: string, shortUrl: string) => {
     if (user) {
-      const encryptedUserId = encrypt(user.uid);
+      const encryptedId = encrypt(user.uid);
       setLoading(true);
       try {
         const response = await fetch('/api/deleteservice', {
@@ -56,7 +56,7 @@ const MyServices = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ encryptedUserId, serviceId, shortUrl }),
+          body: JSON.stringify({ userid: encryptedId, ServiceID: serviceId, ShortUrl: shortUrl }),
         });
 
         if (response.ok) {
