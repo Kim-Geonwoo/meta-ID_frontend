@@ -1,12 +1,40 @@
 {
     "items": [
         {
+            "icon": "github",
+            "id": "1",
+            "link": "https://github.com/Kim-Geonwoo",
+            "title": "링크 바로가기",
+            "type": "link"
+        },
+        {
             "description": "kgw@geonwoo.dev",
             "icon": "envelope",
             "id": "2",
             "link": "kgw@geonwoo.dev",
             "title": "이메일",
             "type": "email"
+        },
+        {
+            "icon": "instagram",
+            "id": "3",
+            "link": "https://www.instagram.com/geonwoo_music",
+            "title": "INSTAGRAM",
+            "type": "link"
+        },
+        {
+            "icon": "apple",
+            "id": "4",
+            "link": "https://music.apple.com/us/artist/%EA%B9%80%EA%B1%B0%EB%88%84/1774774538",
+            "title": "Apple Music",
+            "type": "link"
+        },
+        {
+            "icon": "spotify",
+            "id": "5",
+            "link": "https://t.ly/odhmM",
+            "title": "Spotify",
+            "type": "link"
         },
         {
             "icon": "phone",
@@ -16,27 +44,6 @@
             "type": "tel"
         },
         {
-            "icon": "google",
-            "id": "1",
-            "link": "https://github.com/Kim-Geonwoo",
-            "title": "구글",
-            "type": "link"
-        },
-        {
-            "icon": "youtube",
-            "id": "3",
-            "link": "https://www.kakao.com/",
-            "title": "유튜브",
-            "type": "link"
-        },
-        {
-            "icon": "apple",
-            "id": "4",
-            "link": "https://apple.com",
-            "title": "애플",
-            "type": "link"
-        },
-        {
             "icon": "comment",
             "id": "7",
             "link": "010-1234-5678",
@@ -44,13 +51,14 @@
             "type": "sms"
         },
         {
-            "content": [
-                "안녕하세요. 사용자님!",
-                "이 웹명함은 누구나 간편하게 ",
-                "생성할 수 있는 아이디탭 입니다!"
-            ],
             "id": "8",
+            "title": "설명글_1",
+            "content": [
+                "안녕하세요.",
+                "🎸 기타 아이콘을 가지고있는",
+                "🎵 노래듣는 김건우 입니다"
+            ],
             "type": "description"
         }
     ]
-}
+  }

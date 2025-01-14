@@ -98,6 +98,9 @@ const MyServices = () => {
               <button onClick={() => !loading && confirmDeleteService(service._id, service.shortUrl)} disabled={loading}>
                 {loading ? '삭제 중...' : '삭제'}
               </button>
+              <Link href={`/editService/${service.shortUrl}`}>
+                <button>수정</button>
+              </Link>
             </li>
           ))}
         </ul>
