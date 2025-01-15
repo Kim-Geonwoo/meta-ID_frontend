@@ -1,3 +1,4 @@
+// 추후, 사용자가 샘플을 복사하는 것이 아닌,. 직접 초기 구성(json)을 세팅할수 있도록 구현필요.
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { R2Client, BucketName } from '../lib/r2';
 import { readFileSync } from 'fs';
