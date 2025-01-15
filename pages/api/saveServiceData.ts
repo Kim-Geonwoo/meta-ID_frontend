@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const jsonData = req.body;
 
   try {
-    const service = await Service.findOne({ shortUrl });
+    const service = await Service.findOne({ shortUrl: { $eq: shortUrl } });
     if (!service) {
       return res.status(404).json({ error: '서비스를 찾을 수 없습니다.' });
     }
