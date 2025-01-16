@@ -21,13 +21,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 변동된 데이터를 CloudFlare R2에 저장
-    const command = new PutObjectCommand({
+    const dataCommand = new PutObjectCommand({
       Bucket: BucketName,
       Key: `${shortUrl}/data.json`,
-      Body: JSON.stringify(jsonData),
+      Body: JSON.stringify(jsonData.data),
       ContentType: 'application/json',
     });
-    await R2Client.send(command);
+
+    const contactCommand = new PutObjectCommand({
+      Bucket: BucketName,
+      Key: `${shortUrl}/contact.json`,
+      Body: JSON.stringify(jsonData.contact),
+      ContentType: 'application/json',
+    });
+
+    await Promise.all([
+      R2Client.send(dataCommand),
+      R2Client.send(contactCommand),
+    ]);
+
     res.status(200).json({ message: '저장되었습니다.' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
