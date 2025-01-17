@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useUser } from './lib/auth';
 import { encrypt } from './lib/crypto';
+import EditService from '../components/EditService';
 
 interface Service {
   _id: string;
@@ -98,9 +99,7 @@ const MyServices = () => {
               <button onClick={() => !loading && confirmDeleteService(service._id, service.shortUrl)} disabled={loading}>
                 {loading ? '삭제 중...' : '삭제'}
               </button>
-              <Link href={`/editService/${service.shortUrl}`}>
-                <button>수정</button>
-              </Link>
+              <EditService shortUrl={service.shortUrl} />
             </li>
           ))}
         </ul>

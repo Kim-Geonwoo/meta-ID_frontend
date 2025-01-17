@@ -1,10 +1,8 @@
-// 추후, 이미지도 불러오고 수정할수 있도록 개선필요,. 단, 코드 가독성을 위해서, 이미지 관련 코드는 별도의 컴포넌트와 api로 분리하는 것이 좋음.
-
-// 현재 input 값변경시, 취소 버튼의 변동사항 체킹이 제대로 작동하지 않고있음,. 추후, 수정이 필요함.
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { auth } from '../lib/firebaseClient';
-import { encrypt } from '../lib/crypto';
+import { auth } from '../pages/lib/firebaseClient';
+import { encrypt } from '../pages/lib/crypto';
 import Sortable from 'sortablejs';
 
 // 타입 정의
@@ -19,58 +17,44 @@ interface JsonData {
   [key: string]: any;
 }
 
+interface EditServiceProps {
+  shortUrl: string;
+}
 
-const EditService: React.FC = () => {
-  const router = useRouter();
-  const { shortUrl } = router.query;
-
-
+const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   const [error, setError] = useState<string | null>(null);
-  
-  // 저장중, 버튼비활성화 관련
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [cancelLoading, setCancelLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
-
-  // 초기 json 데이터 설정.
   const [jsonData, setJsonData] = useState<JsonData | null>(null);
   const [contactData, setContactData] = useState<any | null>(null);
   const [initialJsonData, setInitialJsonData] = useState<JsonData | null>(null);
   const [initialContactData, setInitialContactData] = useState<any | null>(null);
-
-
-  const [activeTab, setActiveTab] = useState<string>('data'); // 현재 활성화된 탭
-  
-
+  const [activeTab, setActiveTab] = useState<string>('data');
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
+  const [images, setImages] = useState<string[]>([]);
+  const [showImageModal, setShowImageModal] = useState<boolean>(false);
+  const [newImages, setNewImages] = useState<(File | null)[]>([null, null, null, null]);
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
   const user = auth.currentUser;
   const sortableRef = useRef<HTMLDivElement>(null);
 
-  // json 데이터들 가져오기
   const fetchData = useCallback(async () => {
     try {
       if (!shortUrl || !user) return;
-
-
       const encryptedUserId = encrypt(user.uid);
       const response = await fetch(`/api/getServiceData?shortUrl=${shortUrl}&userId=${encryptedUserId}`);
-      
       if (!response.ok) {
         throw new Error('데이터를 불러오는 중 오류가 발생했습니다.');
       }
-      
-      // json 데이터를 기다린후, 전달받았을때 설정하기.
       const data = await response.json();
       setJsonData(data.data);
       setContactData(data.contact);
       setInitialJsonData(data.data);
       setInitialContactData(data.contact);
-
-
-      // 로컬 스토리지에 데이터 저장
-      localStorage.setItem('jsonData', JSON.stringify(data.data));
-      localStorage.setItem('contactData', JSON.stringify(data.contact));
-
+      localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(data.data));
+      localStorage.setItem(`contactData_${shortUrl}`, JSON.stringify(data.contact));
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
@@ -78,12 +62,24 @@ const EditService: React.FC = () => {
     }
   }, [shortUrl, user]);
 
+  const fetchImages = useCallback(async () => {
+    try {
+      if (!shortUrl || !user) return;
+      const encryptedUserId = encrypt(user.uid);
+      const response = await fetch(`/api/getServiceImage?shortUrl=${shortUrl}&userId=${encryptedUserId}`);
+      if (!response.ok) {
+        throw new Error('이미지를 불러오는 중 오류가 발생했습니다.');
+      }
+      const data = await response.json();
+      setImages(data.images.filter((image: string) => image !== null));
+    } catch (error: any) {
+      setError(error.message);
+    }
+  }, [shortUrl, user]);
 
-  // 로컬 스토리지에서 데이터 가져오기
   useEffect(() => {
-    const storedJsonData = localStorage.getItem('jsonData');
-    const storedContactData = localStorage.getItem('contactData');
-
+    const storedJsonData = localStorage.getItem(`jsonData_${shortUrl}`);
+    const storedContactData = localStorage.getItem(`contactData_${shortUrl}`);
     if (storedJsonData && storedContactData) {
       setJsonData(JSON.parse(storedJsonData));
       setContactData(JSON.parse(storedContactData));
@@ -93,26 +89,20 @@ const EditService: React.FC = () => {
     } else {
       fetchData();
     }
-
-    // 페이지에서 나갈 시 로컬 스토리지 데이터 삭제
+    fetchImages();
     return () => {
-      localStorage.removeItem('jsonData');
-      localStorage.removeItem('contactData');
+      localStorage.removeItem(`jsonData_${shortUrl}`); // 페이지 이탈 시, localStorage에서 데이터 삭제
+      localStorage.removeItem(`contactData_${shortUrl}`); // 페이지 이탈 시, localStorage에서 데이터 삭제
     };
-  }, [fetchData]);
+  }, [fetchData, fetchImages, shortUrl]);
 
-
-
-
-  // Sortable 설정
-  const setupSortable = useCallback(() => {
+  const setupSortable = useCallback(() => { // 드래그 앤 드롭 구현용, sortableJS 라이브러리 구성
     if (sortableRef.current && jsonData?.items) {
       Sortable.create(sortableRef.current, {
-        animation: 150, // 드래그 앤 드롭, 애니메이션 값 설정
+        animation: 150, // 애니메이션 시간, 150ms
         handle: '.drag-handle',
         onStart: () => {
-          // 드래그 시작 전에 로컬 스토리지의 내용을 불러와서 갱신
-          const storedJsonData = localStorage.getItem('jsonData');
+          const storedJsonData = localStorage.getItem(`jsonData_${shortUrl}`);
           if (storedJsonData) {
             setJsonData(JSON.parse(storedJsonData));
           }
@@ -121,57 +111,54 @@ const EditService: React.FC = () => {
           const items = [...jsonData.items];
           const [movedItem] = items.splice(evt.oldIndex, 1);
           items.splice(evt.newIndex, 0, movedItem);
-
-          // UI에서 아이템 위치와 값을 가져오기
-          const updatedItems = Array.from(sortableRef.current.children).map((child: any, index) => {
+          const updatedItems = Array.from(sortableRef.current.children).map((child: any) => {
             const id = child.getAttribute('data-id');
             const title = child.querySelector('input[type="text"]').value;
             const content = child.querySelector('textarea')?.value.split('\n') || [];
             const icon = child.querySelector('input[placeholder="Icon"]')?.value || '';
             const link = child.querySelector('input[placeholder="Link"]')?.value || '';
             const type = jsonData.items.find(item => item.id === id)?.type;
-
             if (type === 'description') {
               return { id, title, content, type };
             } else {
               return { id, title, content, icon, link, type };
             }
           });
-
           const finalJsonData = { ...jsonData, items: updatedItems };
           setJsonData(finalJsonData);
-
-          // 로컬 스토리지에 최종 업데이트된 데이터 저장
-          localStorage.setItem('jsonData', JSON.stringify(finalJsonData));
+          localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(finalJsonData));
+          setHasChanges(true); // 변경사항이 있을 때 hasChanges를 true로 설정
         },
       });
     }
-  }, [jsonData, setJsonData]);
+  }, [jsonData, setJsonData, shortUrl]);
 
-  // data 탭일때만, SortableJS 설정하기.
   useEffect(() => {
-    if (activeTab === 'data') {
+    if (activeTab === 'data') { // data 탭일때만, sortableJS 기능 구성
       setupSortable();
     }
   }, [setupSortable, activeTab]);
 
-  // input 값 변경 핸들러
   const handleInputChange = (index: number, field: string, value: string) => {
     const newItems = [...jsonData.items];
     newItems[index][field] = value;
     const updatedJsonData = { ...jsonData, items: newItems };
     setJsonData(updatedJsonData);
-
-    // 로컬 스토리지에 업데이트된 데이터 저장
-    localStorage.setItem('jsonData', JSON.stringify(updatedJsonData));
+    localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(updatedJsonData));
+    setHasChanges(true); // 변경사항이 있을 때 hasChanges를 true로 설정
   };
 
-  // json데이터 저장로직.
+  const handleContactChange = (field: string, value: string) => {
+    const updatedContactData = { ...contactData, [field]: value };
+    setContactData(updatedContactData);
+    localStorage.setItem(`contactData_${shortUrl}`, JSON.stringify(updatedContactData));
+    setHasChanges(true); // 변경사항이 있을 때 hasChanges를 true로 설정
+  };
+
   const handleSave = async () => {
-    if (saveLoading) return; // 이미 요청 중이면 중복 클릭 방지
+    if (saveLoading || cancelLoading) return; // 저장중일때는 저장버튼 및 취소버튼 비활성화
     setSaveLoading(true);
     setMessage(null);
-
     try {
       const encryptedUserId = user ? encrypt(user.uid) : '';
       const response = await fetch(`/api/saveServiceData?shortUrl=${shortUrl}&userId=${encryptedUserId}`, {
@@ -184,8 +171,9 @@ const EditService: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         setMessage('저장을 완료하였습니다.');
-        setInitialJsonData(jsonData); // 저장 후 초기 데이터 업데이트
+        setInitialJsonData(jsonData);
         setInitialContactData(contactData);
+        setHasChanges(false); // 저장 후 hasChanges를 false로 설정
       } else {
         setMessage(`서버에러: ${data.message}`);
       }
@@ -196,22 +184,78 @@ const EditService: React.FC = () => {
     }
   };
 
-  // 취소할때, 변동사항이 있었으면 팝업띄우기.
-  const handleCancel = () => {
-    const hasChanges = JSON.stringify(jsonData) !== JSON.stringify(initialJsonData) || JSON.stringify(contactData) !== JSON.stringify(initialContactData);
+  const handleCancel = async () => {
+    if (cancelLoading || saveLoading) return; // 취소중일때는 저장버튼 및 취소버튼 비활성화
+    setCancelLoading(true);
+    setMessage(null);
     if (hasChanges) {
       if (confirm('정말로 취소합니까? 변경사항이 저장되지 않습니다.')) {
-        router.push('/myServices');
+        await fetchData(); // R2에서 데이터를 다시 불러오기
+        setMessage('취소를 완료하였습니다.');
+        setHasChanges(false); // 취소 후 hasChanges를 false로 설정
       }
     } else {
-      router.push('/myServices');
+      setMessage('변경된 내용이 없습니다.');
+    }
+    setCancelLoading(false);
+  };
+
+  const handleImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const newImagesCopy = [...newImages];
+      newImagesCopy[index] = e.target.files[0];
+      setNewImages(newImagesCopy);
+
+      // 저장전, 선택된이미지로 이미지 미리보기
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const newImagesSrc = [...images];
+        newImagesSrc[index] = event.target?.result as string;
+        setImages(newImagesSrc);
+      };
+      reader.readAsDataURL(e.target.files[0]);
     }
   };
 
+  const handleImageSave = async (index: number) => {
+    if (!newImages[index]) return;
+    const formData = new FormData();
+    formData.append('image', newImages[index]);
+    try {
+      const encryptedUserId = user ? encrypt(user.uid) : '';
+      const response = await fetch(`/api/saveServiceImage?shortUrl=${shortUrl}&userId=${encryptedUserId}&imageIndex=${index}`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (response.ok) {
+        setMessage('이미지 저장을 완료하였습니다.');
+        fetchImages(); // 새로운 이미지를 다시 불러오기
+        setShowImageModal(false);
+      } else {
+        const data = await response.json();
+        setMessage(`이미지 저장 중 에러: ${data.message}`);
+      }
+    } catch (error: any) {
+      setMessage(`이미지 저장 중 에러: ${error.message}`);
+    }
+  };
+
+  const handleImageCancel = (index: number) => {
+    const newImagesCopy = [...newImages];
+    newImagesCopy[index] = null;
+    setNewImages(newImagesCopy);
+
+   
+    fetchImages(); // 원래 이미지를 다시 불러오기
+
+    // 파일 입력값 초기화
+    if (fileInputRefs.current[index]) {
+      fileInputRefs.current[index].value = '';
+    }
+  };
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div>오류: {error}</div>;
-
 
   return (
     <div>
@@ -220,10 +264,8 @@ const EditService: React.FC = () => {
         <button onClick={() => setActiveTab('data')} disabled={activeTab === 'data'}>Data</button>
         <button onClick={() => setActiveTab('contact')} disabled={activeTab === 'contact'}>Contact</button>
       </div>
-      {/* 데이터 탭일때. */}
       {activeTab === 'data' ? (
         <>
-          {/* <div ref={editorRef} style={{ height: '400px' }}></div>  // json에디터는, 개발용임,. */}
           <div ref={sortableRef} style={{ marginTop: '20px' }}>
             {jsonData?.items.map((item, index) => (
               <div key={item.id} data-id={item.id} style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
@@ -266,78 +308,104 @@ const EditService: React.FC = () => {
         </>
       ) : (
         <div>
-          <input // 이름
+          <input
             type="text"
             value={contactData?.fn || ''}
-            onChange={(e) => setContactData({ ...contactData, fn: e.target.value })}
+            onChange={(e) => handleContactChange('fn', e.target.value)}
             placeholder="Full Name"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // 생일
+          <input
             type="text"
             value={contactData?.birthday || ''}
-            onChange={(e) => setContactData({ ...contactData, birthday: e.target.value })}
+            onChange={(e) => handleContactChange('birthday', e.target.value)}
             placeholder="Birthday"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // 전화번호
+          <input
             type="text"
             value={contactData?.tel || ''}
-            onChange={(e) => setContactData({ ...contactData, tel: e.target.value })}
+            onChange={(e) => handleContactChange('tel', e.target.value)}
             placeholder="Tel"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // 주소(위치)
+          <input
             type="text"
             value={contactData?.address || ''}
-            onChange={(e) => setContactData({ ...contactData, address: e.target.value })}
+            onChange={(e) => handleContactChange('address', e.target.value)}
             placeholder="Address"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // 회사이름
+          <input
             type="text"
             value={contactData?.company || ''}
-            onChange={(e) => setContactData({ ...contactData, company: e.target.value })}
+            onChange={(e) => handleContactChange('company', e.target.value)}
             placeholder="Company"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // 포지션(직업또는 역할)
+          <input
             type="text"
             value={contactData?.position || ''}
-            onChange={(e) => setContactData({ ...contactData, position: e.target.value })}
+            onChange={(e) => handleContactChange('position', e.target.value)}
             placeholder="Position"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // home 이메일(개인 이메일)
+          <input
             type="text"
             value={contactData?.email?.home || ''}
-            onChange={(e) => setContactData({ ...contactData, email: { ...contactData.email, home: e.target.value } })}
+            onChange={(e) => handleContactChange('email.home', e.target.value)}
             placeholder="Home Email"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // work 이메일(회사 이메일)
+          <input
             type="text"
             value={contactData?.email?.work || ''}
-            onChange={(e) => setContactData({ ...contactData, email: { ...contactData.email, work: e.target.value } })}
+            onChange={(e) => handleContactChange('email.work', e.target.value)}
             placeholder="Work Email"
             style={{ marginBottom: '10px', width: '100%' }}
           />
-          <input // 개인 웹사이트 URL 주소
+          <input
             type="text"
             value={contactData?.url || ''}
-            onChange={(e) => setContactData({ ...contactData, url: e.target.value })}
+            onChange={(e) => handleContactChange('url', e.target.value)}
             placeholder="URL"
             style={{ marginBottom: '10px', width: '100%' }}
           />
         </div>
       )}
-      
-      <button onClick={handleSave} disabled={saveLoading}>
+      <button onClick={handleSave} disabled={saveLoading || cancelLoading}>
         {saveLoading ? '저장 중...' : '저장'}
       </button>
-      <button onClick={handleCancel} disabled={saveLoading}>
-        취소
+      <button onClick={handleCancel} disabled={saveLoading || cancelLoading}>
+        {cancelLoading ? '취소 중...' : '취소'}
       </button>
+
+      {/* 이미지 수정 버튼 추가 */}
+      <button onClick={() => setShowImageModal(true)}>이미지 수정</button>
+
+      {showImageModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setShowImageModal(false)}>&times;</span>
+            <h2>이미지 수정</h2>
+            {images.map((image, index) => (
+              <div key={index} style={{ marginBottom: '20px' }}>
+                <Image src={image} alt={`Service Image ${index + 1}`} layout="responsive" width={500} height={300} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(index, e)}
+                  ref={(el) => {
+                    fileInputRefs.current[index] = el;
+                  }}
+                />
+                <button onClick={() => handleImageSave(index)}>이미지 저장</button>
+                <button onClick={() => handleImageCancel(index)}>취소</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

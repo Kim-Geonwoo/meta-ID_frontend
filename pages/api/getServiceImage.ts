@@ -1,46 +1,49 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { R2Client, BucketName } from '../lib/r2';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import Service from '../models/Service';
 import connectDB from '../lib/mongoose';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   await connectDB();
   const { shortUrl, userId } = req.query;
-  const jsonData = req.body;
 
   try {
     const service = await Service.findOne({ shortUrl: { $eq: shortUrl } });
     if (!service) {
       return res.status(404).json({ error: '서비스를 찾을 수 없습니다.' });
     }
-
+    
     // api 요청 시, 암호화 된 userId 와 서비스의 encryptedId 가 일치하는지 확인
     if (service.encryptedId !== userId) {
       return res.status(403).json({ error: '접근이 거부되었습니다.' });
     }
 
-    // 변동된 데이터를 CloudFlare R2에 저장
-    const dataCommand = new PutObjectCommand({
-      Bucket: BucketName,
-      Key: `${shortUrl}/data.json`,
-      Body: JSON.stringify(jsonData.data),
-      ContentType: 'application/json',
+    const imageKeys = [
+      `${shortUrl}/carousel_1.webp`,
+      `${shortUrl}/carousel_2.webp`,
+      `${shortUrl}/carousel_3.webp`,
+      `${shortUrl}/profile.webp`
+    ];
+
+    const imagePromises = imageKeys.map(async (key) => {
+      try {
+        const imageCommand = new GetObjectCommand({
+          Bucket: BucketName,
+          Key: key,
+        });
+        const imageResponse = await R2Client.send(imageCommand);
+        const imageBody = await imageResponse.Body.transformToByteArray();
+        const imageBase64 = Buffer.from(imageBody).toString('base64');
+        return `data:image/webp;base64,${imageBase64}`;
+      } catch (error) {
+        return null;
+      }
     });
 
-    const contactCommand = new PutObjectCommand({
-      Bucket: BucketName,
-      Key: `${shortUrl}/contact.json`,
-      Body: JSON.stringify(jsonData.contact),
-      ContentType: 'application/json',
-    });
+    const images = await Promise.all(imagePromises);
 
-    await Promise.all([
-      R2Client.send(dataCommand),
-      R2Client.send(contactCommand),
-    ]);
-
-    res.status(200).json({ message: '저장되었습니다.' });
+    res.status(200).json({ images });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

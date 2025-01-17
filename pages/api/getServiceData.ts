@@ -18,14 +18,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: '접근이 거부되었습니다.' });
     }
 
-    const command = new GetObjectCommand({
+    const dataCommand = new GetObjectCommand({
       Bucket: BucketName,
       Key: `${shortUrl}/data.json`,
     });
-    const data = await R2Client.send(command);
-    const bodyContents = await data.Body.transformToByteArray();
-    const json = new TextDecoder().decode(bodyContents);
-    res.status(200).json(JSON.parse(json));
+    const contactCommand = new GetObjectCommand({
+      Bucket: BucketName,
+      Key: `${shortUrl}/contact.json`,
+    });
+
+    const [dataResponse, contactResponse] = await Promise.all([
+      R2Client.send(dataCommand),
+      R2Client.send(contactCommand),
+    ]);
+
+    const dataBody = await dataResponse.Body.transformToByteArray();
+    const contactBody = await contactResponse.Body.transformToByteArray();
+
+    const dataJson = new TextDecoder().decode(dataBody);
+    const contactJson = new TextDecoder().decode(contactBody);
+
+    res.status(200).json({
+      data: JSON.parse(dataJson),
+      contact: JSON.parse(contactJson),
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
