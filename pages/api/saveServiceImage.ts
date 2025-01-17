@@ -23,6 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ error: '서비스를 찾을 수 없습니다.' });
     }
 
+    // api 요청 시, 암호화 된 userId 와 서비스의 encryptedId 가 일치하는지 확인
     if (service.encryptedId !== userId) {
       return res.status(403).json({ error: '접근이 거부되었습니다.' });
     }

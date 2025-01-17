@@ -22,7 +22,6 @@ interface EditServiceProps {
 }
 
 const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -92,15 +91,15 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     }
     fetchImages();
     return () => {
-      localStorage.removeItem(`jsonData_${shortUrl}`);
-      localStorage.removeItem(`contactData_${shortUrl}`);
+      localStorage.removeItem(`jsonData_${shortUrl}`); // 페이지 이탈 시, localStorage에서 데이터 삭제
+      localStorage.removeItem(`contactData_${shortUrl}`); // 페이지 이탈 시, localStorage에서 데이터 삭제
     };
   }, [fetchData, fetchImages, shortUrl]);
 
-  const setupSortable = useCallback(() => {
+  const setupSortable = useCallback(() => { // 드래그 앤 드롭 구현용, sortableJS 라이브러리 구성
     if (sortableRef.current && jsonData?.items) {
       Sortable.create(sortableRef.current, {
-        animation: 150,
+        animation: 150, // 애니메이션 시간, 150ms
         handle: '.drag-handle',
         onStart: () => {
           const storedJsonData = localStorage.getItem(`jsonData_${shortUrl}`);
@@ -112,7 +111,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
           const items = [...jsonData.items];
           const [movedItem] = items.splice(evt.oldIndex, 1);
           items.splice(evt.newIndex, 0, movedItem);
-          const updatedItems = Array.from(sortableRef.current.children).map((child: any, index) => {
+          const updatedItems = Array.from(sortableRef.current.children).map((child: any) => {
             const id = child.getAttribute('data-id');
             const title = child.querySelector('input[type="text"]').value;
             const content = child.querySelector('textarea')?.value.split('\n') || [];
@@ -135,7 +134,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   }, [jsonData, setJsonData, shortUrl]);
 
   useEffect(() => {
-    if (activeTab === 'data') {
+    if (activeTab === 'data') { // data 탭일때만, sortableJS 기능 구성
       setupSortable();
     }
   }, [setupSortable, activeTab]);
@@ -157,7 +156,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   };
 
   const handleSave = async () => {
-    if (saveLoading || cancelLoading) return;
+    if (saveLoading || cancelLoading) return; // 저장중일때는 저장버튼 및 취소버튼 비활성화
     setSaveLoading(true);
     setMessage(null);
     try {
@@ -186,7 +185,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   };
 
   const handleCancel = async () => {
-    if (cancelLoading || saveLoading) return;
+    if (cancelLoading || saveLoading) return; // 취소중일때는 저장버튼 및 취소버튼 비활성화
     setCancelLoading(true);
     setMessage(null);
     if (hasChanges) {
@@ -207,7 +206,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
       newImagesCopy[index] = e.target.files[0];
       setNewImages(newImagesCopy);
 
-      // 임시로 이미지를 대체
+      // 저장전, 선택된이미지로 이미지 미리보기
       const reader = new FileReader();
       reader.onload = (event) => {
         const newImagesSrc = [...images];
@@ -246,7 +245,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     newImagesCopy[index] = null;
     setNewImages(newImagesCopy);
 
-    const newImagesSrc = [...images];
+   
     fetchImages(); // 원래 이미지를 다시 불러오기
 
     // 파일 입력값 초기화
@@ -380,6 +379,8 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
       <button onClick={handleCancel} disabled={saveLoading || cancelLoading}>
         {cancelLoading ? '취소 중...' : '취소'}
       </button>
+
+      {/* 이미지 수정 버튼 추가 */}
       <button onClick={() => setShowImageModal(true)}>이미지 수정</button>
 
       {showImageModal && (
