@@ -6,6 +6,8 @@ import { auth } from './lib/firebaseClient'; // 미사용이지만, 내버려두
 import { onAuthStateChanged } from 'firebase/auth'; // 미사용이지만, 내버려두기로 하였음.
 import type { AppProps } from 'next/app';
 
+import {HeroUIProvider} from '@heroui/react'
+
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, setUser] = useState<any>(null); // SetUser는 미사용이지만, 내버려두기로 하였음.
   const router = useRouter();
@@ -24,7 +26,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     return () => unsubscribe(); */ // 미사용이지만, 내버려두기로 하였음.
   }, [router]);
 
-  return <Component {...pageProps} user={user} />;
+  return (
+    <HeroUIProvider>
+      <Component {...pageProps} user={user} />
+    </HeroUIProvider>
+  )
 }
 
 export default MyApp;
