@@ -5,7 +5,15 @@ import Link from 'next/link';
 export default function Home() {
   const user = useUser();
 
-  if (!user) return <div><p>로그인 필요</p> <Link href="/login"><p>로그인</p></Link></div>;
+
+  if (!user) return(
+    <div>
+      <h1>환영합니다 사용자님</h1>
+      <Link href="/login">
+        <p>로그인 하러가기</p>
+      </Link>
+    </div>
+  );
 
   return (
     <div>

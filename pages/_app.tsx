@@ -6,6 +6,7 @@ import { auth } from './lib/firebaseClient'; // 미사용이지만, 내버려두
 import { onAuthStateChanged } from 'firebase/auth'; // 미사용이지만, 내버려두기로 하였음.
 import type { AppProps } from 'next/app';
 
+import Layout from '../components/Layout';
 import {HeroUIProvider} from '@heroui/react'
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -28,7 +29,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <HeroUIProvider>
-      <Component {...pageProps} user={user} />
+      <Layout>
+        <Component {...pageProps} user={user} />
+      </Layout>
     </HeroUIProvider>
   )
 }
