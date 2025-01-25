@@ -1,6 +1,8 @@
+// 이전버전의 createServices.tsx 파일입니다.
+
 import React, { useState } from 'react';
-import { auth } from './lib/firebaseClient';
-import { encrypt } from './lib/crypto';
+import { auth } from '../lib/firebaseClient';
+import { encrypt } from '../lib/crypto';
 import Link from 'next/link';
 
 const CreateServices = () => {

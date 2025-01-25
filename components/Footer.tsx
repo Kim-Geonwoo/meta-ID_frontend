@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Footer 컴포넌트
 const Footer = () => (
     <footer>

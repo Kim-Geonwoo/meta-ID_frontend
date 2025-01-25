@@ -1,55 +1,52 @@
-import React from "react";
+import React from 'react';
 import Link from 'next/link';
-import { Button, Pagination, PaginationItemRenderProps } from "@heroui/react";
 
 const PageBar = () => {
-  const renderPaginationItem = (props: PaginationItemRenderProps) => {
-    const { value, isActive, setPage } = props;
-    let href = '/';
-    let text = '';
-    switch (value) {
-      case 1:
-        href = '/';
-        text = '홈';
-        break;
-      case 2:
-        href = '/createServices';
-        text = '서비스 생성';
-        break;
-      case 3:
-        href = '/myServices';
-        text = '나의 서비스들';
-        break;
-      case 4:
-        href = '/updates';
-        text = '업데이트';
-        break;
-      case 5:
-        href = '/about';
-        text = '소개';
-        break;
-      default:
-        href = '/';
-        text = '홈';
-    }
-
-    return (
-        <Button color="primary" variant="bordered" className={`p-2 ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
-            <Link href={href} key={value}>
-            <p
-                onClick={() => setPage(Number(value))}
-            >
-                {text}
-            </p>
-            </Link>
-        </Button>
-    );
-  };
-
   return (
-    <div className="flex gap-4 p-4 bg-black">
-      <Pagination initialPage={1} total={5} renderItem={renderPaginationItem} variant="bordered" />
-    </div>
+    <nav className="bg-black h-14 place-content-center">
+      <ul className="flex justify-center">
+        <li className="flex flex-col items-center pr-7">
+          <Link href="/sharemyid">
+            <div className="flex flex-col items-center">
+              <i className="ri-send-plane-fill text-white ri-lg"></i>
+              <p className="text-xs text-white">공유하기</p>
+            </div>
+          </Link>
+        </li>
+        <li className="flex flex-col items-center pr-7">
+          <Link href="/myid">
+            <div className="flex flex-col items-center">
+              <i className="ri-id-card-fill text-white ri-lg"></i>
+              <p className="text-xs text-white">나의 명함</p>
+            </div>
+          </Link>
+        </li>
+        <li className="flex flex-col items-center pr-7">
+          <Link href="/">
+            <div className="flex flex-col items-center">
+              <i className="ri-add-circle-fill text-white ri-lg"></i>
+              <p className="text-xs text-white">명함 만들기</p>
+            </div>
+          </Link>
+        </li>
+        <li className="flex flex-col items-center pr-7">
+          <Link href="/analytics">
+            <div className="flex flex-col items-center">
+              <i className="ri-bar-chart-box-fill text-white ri-lg"></i>
+              <p className="text-xs text-white">명함통계</p>
+            </div>
+          </Link>
+        </li>
+        <li className="flex flex-col items-center">
+          <Link href="/settings">
+            <div className="flex flex-col items-center">
+              <i className="ri-settings-5-fill text-white ri-lg"></i>
+              <p className="text-xs text-white">앱 설정</p>
+            </div>
+          </Link>
+        </li>
+      </ul>
+    </nav>
   );
 };
 

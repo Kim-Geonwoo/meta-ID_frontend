@@ -1,4 +1,4 @@
-// import {heroui} from "@heroui/react";
+import {heroui} from "@heroui/react";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,19 +8,20 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
 
     // HeroUI(구 NextUI) 미사용 
-    // "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
 
     // PrelineUI 사용
     './node_modules/preline/preline.js',
   ],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      fontFamily: {
+        ibm: ['"IBM Plex Sans KR"', 'sans-serif'],
       },
     },
+    //커스텀 폰트추가 - ibm plex sans KR
+    
   },
   darkMode: "class",
-  plugins: [require('preline/plugin'),]
+  plugins: [require('preline/plugin'), heroui()],
 };
