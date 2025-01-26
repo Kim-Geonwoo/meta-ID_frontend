@@ -81,30 +81,31 @@ const MyServices = () => {
   };
 
   return (
-    <div>
-      <h1>나의 서비스들</h1>
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
+      <div className="">나의 명함</div>
       {error && <p style={{ color: 'red' }}>오류발생: {error}</p>}
       {services.length === 0 ? (
-        <div>
+        <div className="">
           <p>아직 서비스가 없습니다</p>
         </div>
       ) : (
-        <ul>
-          {services.map((service) => (
-            <li key={service.shortUrl}>
-              <h2>{service.name}</h2>
-              <p>{service.description}</p>
-              <p>{service.shortUrl}</p>
-              <p>{new Date(service.createdAt).toLocaleString()}</p>
-              <button onClick={() => !loading && confirmDeleteService(service._id, service.shortUrl)} disabled={loading}>
-                {loading ? '삭제 중...' : '삭제'}
-              </button>
-              <EditService shortUrl={service.shortUrl} />
-            </li>
-          ))}
-        </ul>
+        <div className="">
+          <ul>
+            {services.map((service) => (
+              <li key={service.shortUrl}>
+                <h2>{service.name}</h2>
+                <p>{service.description}</p>
+                <p>{service.shortUrl}</p>
+                <p>{new Date(service.createdAt).toLocaleString()}</p>
+                <button onClick={() => !loading && confirmDeleteService(service._id, service.shortUrl)} disabled={loading}>
+                  {loading ? '삭제 중...' : '삭제'}
+                </button>
+                <EditService shortUrl={service.shortUrl} />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-      <Link href="/createServices">서비스 생성 하러가기</Link>
       <br />
       <Link href="/">메인으로</Link>
     </div>
