@@ -1,4 +1,5 @@
 .env.local
+.env
 node_modules
 .next
 
@@ -12,3 +13,5 @@ next-env.d.ts
 # misc
 .DS_Store
 *.pem
+
+package-lock.json

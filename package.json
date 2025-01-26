@@ -29,7 +29,7 @@
     "immer": "^10.1.1",
     "jsoneditor": "^10.1.2",
     "mongodb": "^6.12.0",
-    "mongoose": "^8.9.4",
+    "mongoose": "^8.9.5",
     "motion": "^12.0.5",
     "next": "14.2.22",
     "preline": "^2.7.0",
