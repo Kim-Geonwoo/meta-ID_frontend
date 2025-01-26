@@ -15,4 +15,10 @@ const nextConfig = {
     reactStrictMode: true,
   };
   
-  module.exports = nextConfig;
+  module.exports = {
+    images: {
+        domains: ['img-sv.geonwoo.dev']
+    },
+    reactStrictMode: true,
+    ...nextConfig
+  };
