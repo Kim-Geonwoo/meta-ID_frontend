@@ -10,6 +10,7 @@ import type { AppProps } from 'next/app';
 
 import Layout from '../components/Layout';
 import {HeroUIProvider} from '@heroui/react'
+import PrelineScript from '../components/PrelineScript';
 
 
 
@@ -47,9 +48,10 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <HeroUIProvider>
       <Layout>
-      <div className={ibmPlexSansKR.className}>
-        <Component {...pageProps} user={user} />
-      </div>
+        <PrelineScript />
+        <div className={ibmPlexSansKR.className}>
+          <Component {...pageProps} user={user} />
+        </div>
       </Layout>
     </HeroUIProvider>
   )

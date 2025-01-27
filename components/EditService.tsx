@@ -278,7 +278,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
                 />
                 {item.type === 'description' ? (
                   <textarea
-                    value={item.content.join('\n')}
+                    value={item.content}
                     onChange={(e) => handleInputChange(index, 'content', e.target.value)}
                     placeholder="Content"
                     style={{ marginRight: '10px' }}

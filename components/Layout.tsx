@@ -1,12 +1,11 @@
 import React from 'react';
 import Header from './Header';
 import PageBar from './PageBar';
-import PrelineScript from "./PrelineScript";
 import AppBar from "./AppBar";
 
 const Layout = ({ children }) => (
   <div className={`flex flex-col`}>
-    <PrelineScript />
+    
     {/* 상단 메뉴바 (미사용) */}
     {/* <Header /> */}
 
@@ -17,7 +16,6 @@ const Layout = ({ children }) => (
     <main className="w-full max-h-[calc(100vh-10rem)] overflow-y-auto">
       {children}
     </main>
-    
     {/* 하단 메뉴바 */}
     <PageBar />
   </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useUser } from './lib/auth';
 import { auth } from './lib/firebaseClient';
 import { encrypt } from './lib/crypto';
 import { useRouter } from 'next/router';
@@ -6,9 +7,15 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import Link from 'next/link';
 
 
+
+import { Switch } from '@heroui/react';
+
+import CreateServiceStepper from '../components/CreateServiceStepper';
+
 import Login from '../components/Login';
 import Signup from '../components/Signup';
-import { Switch } from '@heroui/react';
+
+
 
 import { HoverCard } from '../components/HoverCard';
 
@@ -25,23 +32,10 @@ const Home = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const user = auth.currentUser;
+  const user = useUser();
 
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const router = useRouter();
-
-
-  const handleLogin = async (e: React.FormEvent) => {
-      e.preventDefault();
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        router.push('/'); // 로그인 후, 새로고침.
-      } catch (error: any) {
-        alert(error.message);
-      }
-    };
+  
 
 
   const handleCreateServices = async () => {
@@ -52,11 +46,7 @@ const Home = () => {
     try {
       const user = auth.currentUser;
 
-      if (!user) {
-        alert('먼저 로그인이 필요합니다.');
-        setLoading(false);
-        return;
-      }
+      
 
       const encryptedUserId = encrypt(user.uid);
       const response = await fetch('/api/createservices', {
@@ -208,12 +198,15 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="w-[16rem] h-48 mt-[2rem]">
+      <div className="w-[24rem] h-48 mt-[2rem]">
         {user ? 
-          <div className="flex flex-col w-[16rem] h-48 items-center">
+          <div className="flex flex-col w-[24rem] h-48 items-center">
             {/* 이제 하단에 Stepper형식의 서비스 생성코드 추가필요. */}
             <h1 className="mt-6 text-2xl font-semibold">서비스 생성</h1>
-            <input
+
+            <CreateServiceStepper />
+
+            {/* <input
             type="text"
             placeholder="서비스 이름"
               value={name}
@@ -229,7 +222,7 @@ const Home = () => {
               {loading ? '생성 중...' : '생성'}
             </button>
             {message && <p>{message}</p>}
-            <br />
+            <br /> */}
         </div>
       :        
         <div className="mb-6">

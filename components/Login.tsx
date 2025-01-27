@@ -39,9 +39,6 @@ export default function Login() {
             </div>
 
             <div>
-              <div className="flex justify-between items-center">
-                <Link href="/forgotpassword"><p className="inline-flex items-center gap-x-1 text- text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium">내 비밀번호 찾기</p></Link>
-              </div>
               <div className="relative">
                 <input type="password"
                 value={password}
@@ -49,6 +46,9 @@ export default function Login() {
                 pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$"
                 onChange={(e) => setPassword(e.target.value)}
                 className="py-1.5 px-2 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" required aria-describedby="password-error" />
+              </div>
+              <div className="flex justify-end items-center mt-1">
+                <Link href="/forgotpassword"><p className="inline-flex items-center gap-x-1 text- text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium">내 비밀번호 찾기</p></Link>
               </div>
             </div>
             <button type="submit" className="w-full py-1 px-2 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">로그인</button>

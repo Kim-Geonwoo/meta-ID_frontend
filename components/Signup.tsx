@@ -49,8 +49,8 @@ export default function Signup() {
             });
     
             if (response.ok) {
-              alert('회원가입이 완료되었습니다! 로그인페이지로 이동합니다.');
-              router.push('/login'); // 회원가입 성공 후, 로그인페이지로 자동이동.
+              alert('회원가입이 완료되었어요!');
+              router.push('/'); // 회원가입 성공 후, 로그인페이지로 자동이동.
             } else {
               const data = await response.json();
               alert(`회원가입 중, 오류발생: ${data.error}`);
