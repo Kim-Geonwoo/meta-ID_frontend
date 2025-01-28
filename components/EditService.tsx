@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { auth } from '../pages/lib/firebaseClient';
 import { encrypt } from '../pages/lib/crypto';
 import Sortable from 'sortablejs';
+import EditServiceImg from './EditServiceImg';
 
 // 타입 정의
 interface JsonItem {
@@ -33,10 +33,6 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   const [initialContactData, setInitialContactData] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState<string>('data');
   const [hasChanges, setHasChanges] = useState<boolean>(false);
-  const [images, setImages] = useState<string[]>([]);
-  const [showImageModal, setShowImageModal] = useState<boolean>(false);
-  const [newImages, setNewImages] = useState<(File | null)[]>([null, null, null, null]);
-  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
   const user = auth.currentUser;
   const sortableRef = useRef<HTMLDivElement>(null);
 
@@ -62,21 +58,6 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     }
   }, [shortUrl, user]);
 
-  const fetchImages = useCallback(async () => {
-    try {
-      if (!shortUrl || !user) return;
-      const encryptedUserId = encrypt(user.uid);
-      const response = await fetch(`/api/getServiceImage?shortUrl=${shortUrl}&userId=${encryptedUserId}`);
-      if (!response.ok) {
-        throw new Error('이미지를 불러오는 중 오류가 발생했습니다.');
-      }
-      const data = await response.json();
-      setImages(data.images.filter((image: string) => image !== null));
-    } catch (error: any) {
-      setError(error.message);
-    }
-  }, [shortUrl, user]);
-
   useEffect(() => {
     const storedJsonData = localStorage.getItem(`jsonData_${shortUrl}`);
     const storedContactData = localStorage.getItem(`contactData_${shortUrl}`);
@@ -89,17 +70,16 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     } else {
       fetchData();
     }
-    fetchImages();
     return () => {
-      localStorage.removeItem(`jsonData_${shortUrl}`); // 페이지 이탈 시, localStorage에서 데이터 삭제
-      localStorage.removeItem(`contactData_${shortUrl}`); // 페이지 이탈 시, localStorage에서 데이터 삭제
+      localStorage.removeItem(`jsonData_${shortUrl}`);
+      localStorage.removeItem(`contactData_${shortUrl}`);
     };
-  }, [fetchData, fetchImages, shortUrl]);
+  }, [fetchData, shortUrl]);
 
-  const setupSortable = useCallback(() => { // 드래그 앤 드롭 구현용, sortableJS 라이브러리 구성
+  const setupSortable = useCallback(() => {
     if (sortableRef.current && jsonData?.items) {
       Sortable.create(sortableRef.current, {
-        animation: 150, // 애니메이션 시간, 150ms
+        animation: 150,
         handle: '.drag-handle',
         onStart: () => {
           const storedJsonData = localStorage.getItem(`jsonData_${shortUrl}`);
@@ -127,14 +107,14 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
           const finalJsonData = { ...jsonData, items: updatedItems };
           setJsonData(finalJsonData);
           localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(finalJsonData));
-          setHasChanges(true); // 변경사항이 있을 때 hasChanges를 true로 설정
+          setHasChanges(true);
         },
       });
     }
   }, [jsonData, setJsonData, shortUrl]);
 
   useEffect(() => {
-    if (activeTab === 'data') { // data 탭일때만, sortableJS 기능 구성
+    if (activeTab === 'data') {
       setupSortable();
     }
   }, [setupSortable, activeTab]);
@@ -145,18 +125,18 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     const updatedJsonData = { ...jsonData, items: newItems };
     setJsonData(updatedJsonData);
     localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(updatedJsonData));
-    setHasChanges(true); // 변경사항이 있을 때 hasChanges를 true로 설정
+    setHasChanges(true);
   };
 
   const handleContactChange = (field: string, value: string) => {
     const updatedContactData = { ...contactData, [field]: value };
     setContactData(updatedContactData);
     localStorage.setItem(`contactData_${shortUrl}`, JSON.stringify(updatedContactData));
-    setHasChanges(true); // 변경사항이 있을 때 hasChanges를 true로 설정
+    setHasChanges(true);
   };
 
   const handleSave = async () => {
-    if (saveLoading || cancelLoading) return; // 저장중일때는 저장버튼 및 취소버튼 비활성화
+    if (saveLoading || cancelLoading) return;
     setSaveLoading(true);
     setMessage(null);
     try {
@@ -173,7 +153,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
         setMessage('저장을 완료하였습니다.');
         setInitialJsonData(jsonData);
         setInitialContactData(contactData);
-        setHasChanges(false); // 저장 후 hasChanges를 false로 설정
+        setHasChanges(false);
       } else {
         setMessage(`서버에러: ${data.message}`);
       }
@@ -185,73 +165,19 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   };
 
   const handleCancel = async () => {
-    if (cancelLoading || saveLoading) return; // 취소중일때는 저장버튼 및 취소버튼 비활성화
+    if (cancelLoading || saveLoading) return;
     setCancelLoading(true);
     setMessage(null);
     if (hasChanges) {
       if (confirm('정말로 취소합니까? 변경사항이 저장되지 않습니다.')) {
-        await fetchData(); // R2에서 데이터를 다시 불러오기
+        await fetchData();
         setMessage('취소를 완료하였습니다.');
-        setHasChanges(false); // 취소 후 hasChanges를 false로 설정
+        setHasChanges(false);
       }
     } else {
       setMessage('변경된 내용이 없습니다.');
     }
     setCancelLoading(false);
-  };
-
-  const handleImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const newImagesCopy = [...newImages];
-      newImagesCopy[index] = e.target.files[0];
-      setNewImages(newImagesCopy);
-
-      // 저장전, 선택된이미지로 이미지 미리보기
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const newImagesSrc = [...images];
-        newImagesSrc[index] = event.target?.result as string;
-        setImages(newImagesSrc);
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  };
-
-  const handleImageSave = async (index: number) => {
-    if (!newImages[index]) return;
-    const formData = new FormData();
-    formData.append('image', newImages[index]);
-    try {
-      const encryptedUserId = user ? encrypt(user.uid) : '';
-      const response = await fetch(`/api/saveServiceImage?shortUrl=${shortUrl}&userId=${encryptedUserId}&imageIndex=${index}`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (response.ok) {
-        setMessage('이미지 저장을 완료하였습니다.');
-        fetchImages(); // 새로운 이미지를 다시 불러오기
-        setShowImageModal(false);
-      } else {
-        const data = await response.json();
-        setMessage(`이미지 저장 중 에러: ${data.message}`);
-      }
-    } catch (error: any) {
-      setMessage(`이미지 저장 중 에러: ${error.message}`);
-    }
-  };
-
-  const handleImageCancel = (index: number) => {
-    const newImagesCopy = [...newImages];
-    newImagesCopy[index] = null;
-    setNewImages(newImagesCopy);
-
-   
-    fetchImages(); // 원래 이미지를 다시 불러오기
-
-    // 파일 입력값 초기화
-    if (fileInputRefs.current[index]) {
-      fileInputRefs.current[index].value = '';
-    }
   };
 
   if (loading) return <div>로딩 중...</div>;
@@ -268,7 +194,9 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
         <>
           <div ref={sortableRef} style={{ marginTop: '20px' }}>
             {jsonData?.items.map((item, index) => (
-              <div key={item.id} data-id={item.id} style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
+              <div key={item.id}
+              data-id={item.id}
+              className="">
                 <input
                   type="text"
                   value={item.title}
@@ -278,7 +206,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
                 />
                 {item.type === 'description' ? (
                   <textarea
-                    value={item.content.join('\n')}
+                    value={item.content}
                     onChange={(e) => handleInputChange(index, 'content', e.target.value)}
                     placeholder="Content"
                     style={{ marginRight: '10px' }}
@@ -379,33 +307,6 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
       <button onClick={handleCancel} disabled={saveLoading || cancelLoading}>
         {cancelLoading ? '취소 중...' : '취소'}
       </button>
-
-      {/* 이미지 수정 버튼 추가 */}
-      <button onClick={() => setShowImageModal(true)}>이미지 수정</button>
-
-      {showImageModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setShowImageModal(false)}>&times;</span>
-            <h2>이미지 수정</h2>
-            {images.map((image, index) => (
-              <div key={index} style={{ marginBottom: '20px' }}>
-                <Image src={image} alt={`Service Image ${index + 1}`} layout="responsive" width={500} height={300} />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(index, e)}
-                  ref={(el) => {
-                    fileInputRefs.current[index] = el;
-                  }}
-                />
-                <button onClick={() => handleImageSave(index)}>이미지 저장</button>
-                <button onClick={() => handleImageCancel(index)}>취소</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,9 +1,7 @@
 // 유저 모델 정의
 import mongoose, { Schema, models } from "mongoose";
 
-export const userSchema = new Schema({
-  _id: Schema.Types.ObjectId,
-
+export const userSchema = new Schema({  
   userId: {
     type: String,
     unique: true,

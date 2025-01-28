@@ -1,15 +1,22 @@
 // 에러페이지를 커스텀하기 위한 파일 
 
 import React from 'react';
+import { useRouter } from 'next/router';
+
 
 const Error = ({ statusCode }) => {
+  const router = useRouter();
+  const currentRoute = router.asPath;
+
   return (
     // 에러페이지 화면의 최대 높이지정 및 기타정렬 코드
-    <div className="flex flex-col items-center justify-center h-[calc(100vh-6.5rem)]">
+    // 웹앱용 화면크기 <div className="flex flex-col items-center justify-center h-[calc(100vh-6.5rem)]">
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
       {statusCode === 404 ? (
         <div>
           <h1>404 - 페이지를 찾을 수 없습니다.</h1>
           <p>죄송합니다. 요청하신 페이지를 찾을 수 없습니다.</p>
+          <p>존재하지 않는 페이지: |&gt;  {currentRoute}  &lt;| </p>
         </div>
       ) : statusCode === 500 ? (
         <div>

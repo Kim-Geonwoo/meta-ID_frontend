@@ -15,7 +15,7 @@ export function HoverCard() {
         <CardItem
             translateZ="20"
             rotateX={-5}
-            className="w-full mt-4 place-items-center"
+            className="flex flex-col w-full mt-4 place-items-center"
             >
           {/* CardItem 컴포넌트 첫번째 - 프로필사진 */}
           <CardItem
@@ -42,16 +42,24 @@ export function HoverCard() {
             translateZ="40"
             rotateX={-5}
             
-            className="text-neutral-500 text-sm max-w-sm mt-2"
+            className="text-neutral-500 text-sm max-w-sm mt-1"
           >
-            <div className="text-2xl font-sans font-medium  flex justify-center items-center mt-2">
-              <span className="text-green-500 text-sm">●</span>
+            <div className="text-2xl font-sans font-medium  flex justify-center items-center">
+              <span className="text-green-500 text-xs">●</span>
               <span id="contact-jobs" className="text-green-500 text-sm ml-1">메타ID 사용중</span>
             </div>
           </CardItem>
 
           {/* 링크 박스시작 */}
-          <p className="text-center text-gray-600 mt-10 mb-2">링크 바로가기</p>
+          <CardItem
+            translateZ="40"
+            rotateX={-5}
+            
+            className="text-neutral-500 text-sm max-w-sm mt-2"
+          >
+            <p className="text-center text-gray-600 mt-6 mb-2">링크 바로가기</p>
+          </CardItem>
+          
           
           <CardItem
             translateZ="40"
