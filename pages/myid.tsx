@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useUser } from './lib/auth';
 import { encrypt } from './lib/crypto';
 import EditService from '../components/EditService';
+import EditServiceImg from '../components/EditServiceImg';
 
 interface Service {
   _id: string;
@@ -101,6 +102,7 @@ const MyServices = () => {
                   {loading ? '삭제 중...' : '삭제'}
                 </button>
                 <EditService shortUrl={service.shortUrl} />
+                <EditServiceImg shortUrl={service.shortUrl} />
               </li>
             ))}
           </ul>
