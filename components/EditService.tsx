@@ -4,7 +4,6 @@ import { auth } from '../pages/lib/firebaseClient';
 import { encrypt } from '../pages/lib/crypto';
 import Sortable from 'sortablejs';
 import EditServiceImg from './EditServiceImg';
-import { Input } from '@heroui/react';
 
 // 타입 정의
 interface JsonItem {
@@ -227,21 +226,6 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
                       onChange={(e) => handleInputChange(index, 'link', e.target.value)}
                       placeholder="Link"
                       style={{ marginRight: '10px' }}
-                    />
-                    <Input
-                      endContent={
-                        <div className="pointer-events-none flex items-center">
-                          <span className="text-default-400 text-small">.org</span>
-                        </div>
-                      }
-                      label="Website" 
-                      placeholder="heroui"
-                      startContent={
-                        <div className="pointer-events-none flex items-center">
-                          <span className="text-default-400 text-small">https://</span>
-                        </div>
-                      }
-                      type="url"
                     />
                   </>
                 )}
