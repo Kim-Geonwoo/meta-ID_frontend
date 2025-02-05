@@ -6,7 +6,8 @@ import { auth } from './lib/firebaseClient'; // 미사용이지만, 내버려두
 import { onAuthStateChanged } from 'firebase/auth'; // 미사용이지만, 내버려두기로 하였음.
 import type { AppProps } from 'next/app';
 
-
+// 리캡챠 표시 제거
+import "../styles/helloapp.css";
 
 import Layout from '../components/Layout';
 import {HeroUIProvider} from '@heroui/react'

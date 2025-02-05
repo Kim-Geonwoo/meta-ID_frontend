@@ -281,7 +281,7 @@ const HelloApp = () => {
         <>
           <Input
             autoComplete="one-time-code"
-            className="py-1 pt-2"
+            className="mt-8 w-64 text-white"
             label="인증 코드"
             radius="none"
             size="md"
@@ -291,7 +291,7 @@ const HelloApp = () => {
             onChange={handleVerificationCodeChange}
           />
           <Button
-            className="fixed bottom-3 w-[calc(100%-3rem)]"
+            className="mt-8 w-64"
             isDisabled={disableButton}
             radius="none"
             onPress={handleVerifyCode}
