@@ -11,9 +11,9 @@ const Layout = ({ children }) => {
   {/* helloapp 페이지일 경우, 페이지바 제거 및 레이아웃 크기조절 */}
   if (isHelloAppsPage) {
     return (
-      <div className={`flex flex-col`}>
+      <div className={`relative flex flex-col h-screen bg-black`}>
         <AppBar />
-        <main className="w-full max-h-[calc(100vh-6.5rem)] overflow-y-auto">
+        <main className="container mx-auto max-w-7xl pt-6 px-6 flex-grow overflow-y-auto">
           {children}
         </main>
       </div>

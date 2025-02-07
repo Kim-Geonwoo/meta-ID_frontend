@@ -18,6 +18,9 @@ import Signup from '../components/Signup';
 
 
 import { HoverCard } from '../components/HoverCard';
+import { useEffect } from 'react';
+import router from 'next/router';
+import HelloApp from './helloapp';
 
 const Home = () => {
 
@@ -33,8 +36,6 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
 
   const user = useUser();
-
-
   
 
 
@@ -45,6 +46,8 @@ const Home = () => {
 
     try {
       const user = auth.currentUser;
+
+      
 
       
 
@@ -153,8 +156,9 @@ const Home = () => {
     );
   };
 
-
-  return (
+  if(!user) {
+    return <HelloApp />;
+  } else (
     <div className="flex flex-col items-center pb-3 h-[calc(100vh-10rem)] bg-gray-300">
     {/* 앱전용 화면크기 <div className="flex flex-col items-center pb-3 h-[calc(100vh-6.5rem)] bg-gray-300"> */}
 

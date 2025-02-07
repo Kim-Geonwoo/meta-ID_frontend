@@ -29,22 +29,21 @@ const ibmPlexSansKR = IBM_Plex_Sans_KR({
 
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [user, setUser] = useState<any>(null); // SetUser는 미사용이지만, 내버려두기로 하였음.
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    /*
-    // Listen for changes to auth state (logged in, signed out, etc.)
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+  //     setUser(currentUser);
 
-      if (!currentUser) {
-        router.push('/login');
-      }
-    });
+  //     if (!currentUser) {
+  //       router.replace('/helloapp');
+  //     }
+  //   });
 
-    return () => unsubscribe(); */ // 미사용이지만, 내버려두기로 하였음.
-  }, [router]);
+  //   return () => unsubscribe();
+  //    // 미사용이지만, 내버려두기로 하였음.
+  // }, [router]);
 
   return (
     <HeroUIProvider>

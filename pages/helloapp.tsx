@@ -31,9 +31,11 @@ const HelloApp = () => {
 
   useEffect(() => {
     if (user) {
-      router.push('/');
+      router.replace("/");
     }
   });
+
+  
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -46,6 +48,34 @@ const HelloApp = () => {
   const [isHelloPage, setIsHelloPage] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
   const [closeHelloPage, setCloseHelloPage] = useState(false);
+  const [submitted, setSubmitted] = useState(null);
+  const errors_pw = [];
+  const errors_hp = [];
+  const errors_email = [];
+  
+
+
+  //비밀번호 형식 검증
+  if (password.length < 4) {
+    errors_pw.push("비밀번호는 4자 이상이어야 합니다.");
+  }
+  if ((password.match(/[A-Z]/g) || []).length < 1) {
+    errors_pw.push("비밀번호에는 최소 1개의 대문자가 포함되어야 합니다.");
+  }
+  if ((password.match(/[^a-z0-9]/gi) || []).length < 1) {
+    errors_pw.push("비밀번호에는 최소 1개의 기호가 포함되어야 합니다.");
+  }
+
+  //전화번호 형식 검증
+  if (phoneNumber.match(/^\d{3}-\d{4}-\d{4}$/)) {
+    errors_hp.push("전화번호 형식이 올바르지 않습니다.");
+  }
+
+  //이메일 형식 검증
+  if (email.match(/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/)) {
+    errors_email.push("이메일 형식이 올바르지 않습니다.");
+  }
+
 
   const handlePhoneNumberChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -121,8 +151,7 @@ const HelloApp = () => {
     if (auth.currentUser) {
       linkWithCredential(auth.currentUser, credential)
         .then(() => {
-          alert("계정이 성공적으로 연동되었습니다.");
-          router.push("/");
+          router.replace("/");
         })
         .catch((error: { message: string }) => {
           setError("계정 연동 중 오류가 발생했습니다: " + error.message);
@@ -169,23 +198,18 @@ const HelloApp = () => {
     isVerified,
   ]);
 
-  const ImageWrapper = ({ children }: { children: React.ReactNode }) => (
-    <div className="flex justify-end w-[calc(100%-4rem)] h-[calc(100%-13rem)]">
-      {children}
-    </div>
-  );
 
   
 
   return (
-    <div className="flex flex-col items-center justify-center h-[calc(100vh-6.5rem)] bg-black">
+    <div className="overflow-hidden flex flex-col items-center bg-black">
       {isHelloPage && (
         <>
-         <div className="flex flex-col ml-4 justify-center text-white font-semibold text-2xl text-start">
+         <div className="mt-2 w-[calc(100%-4rem)] h-[calc(100%-13rem)] flex flex-col justify-start items-start text-white font-semibold text-2xl text-start">
           <div>
               <Image
                 alt="logo"
-                className="mb-2 justify-start"
+                className="mb-2"
                 height={50}
                 src="/icons/icon-512-maskable.png"
                 width={50}
@@ -193,23 +217,30 @@ const HelloApp = () => {
               디지털 명함으로 만나요.
               <br />
               공유하는 | 메타 ID
-                <Image
-                layout="responsive"
-                width={400}
-                height={700}
-                alt="hero"
-                  src="/icons/display_example-1.png"
-                />
+              
+                
             </div>
-            <Button
-              className="flex flex-col w-48 mt-4 self-end"
-              size="md"
-              radius="none"
-              onPress={() => setIsHelloPage(false)}
-            >
-              휴대폰 번호로 시작하기
-            </Button>
+            {/* <div className="flex flex-row items-center justify-between">
+              
+              <Button
+                className="flex flex-col w-40 mt-4 self-end"
+                size="md"
+                radius="none"
+                onPress={() => setIsHelloPage(false)}
+              >
+                휴대폰 번호로 시작하기
+              </Button> 
+            </div> */}
           </div>
+          <div className="flex flex-col items-center w-[calc(100%-4rem)] h-[calc(100%-13rem)]">
+                <Image
+                  layout="responsive"
+                  width={400}
+                  height={700}
+                  alt="hero"
+                    src="/icons/display_example-1.png"
+                  />
+              </div>
         </>
       )}
 
@@ -219,7 +250,7 @@ const HelloApp = () => {
         </button>
       )}
 
-      <div className="">
+      <div className="mt-[2.5rem] w-[calc(100%-4rem)] h-[calc(100%-13rem)]">
         {!isHelloPage && !isVerified && (
           <>
             <span className="flex text-white font-semibold text-xl items-start">
@@ -264,7 +295,7 @@ const HelloApp = () => {
       </div>
 
       <div id="recaptcha-container" />
-      {!isHelloPage && !isCodeSent && (
+      {/* {!isHelloPage && !isCodeSent && (
         <Button
           className="mt-8 w-64"
           isDisabled={disableButton}
@@ -274,14 +305,14 @@ const HelloApp = () => {
         >
           인증 코드 받기
         </Button>
-      )}
+      )} */}
 
       {/* 코드를 발송했다면, 표시 */}
       {!isHelloPage && !isVerified && isCodeSent && (
-        <>
+        <div className="mt-8 w-[calc(100%-4rem)] h-[calc(100%-13rem)]">
           <Input
             autoComplete="one-time-code"
-            className="mt-8 w-64 text-white"
+            className="py-1 text-white"
             label="인증 코드"
             radius="none"
             size="md"
@@ -290,36 +321,37 @@ const HelloApp = () => {
             variant="bordered"
             onChange={handleVerificationCodeChange}
           />
-          <Button
+          {/* <Button
             className="mt-8 w-64"
             isDisabled={disableButton}
             radius="none"
             onPress={handleVerifyCode}
           >
             인증 확인
-          </Button>
-        </>
+          </Button> */}
+        </div>
       )}
       {/* 전화번호 인증이 완료됬다면, 표시 */}
-      {!isHelloPage && isVerified && (
+      {/* 미사용 */}
+      {/* {!isHelloPage && isVerified && (
         <>
-          <span className="flex text-white font-medium text-xl items-start">
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            벌써<a className="font-semibold text-blue-600 px-0.5"> 마지막 </a>
+          <span className="mb-0.5 flex text-start self-start text-white font-medium text-xl">
+             eslint-disable-next-line jsx-a11y/anchor-is-valid 
+            벌써<a className="font-semibold items-start text-blue-600 px-0.5"> 마지막 </a>
             이에요!
           </span>
-          <span className="flex text-white font-semibold text-xl items-start">
+          <span className="mb-0.5 flex text-white self-start font-semibold text-xl items-start">
             원활한 서비스 이용을 위해서
           </span>
-          <span className="flex text-white font-semibold text-xl items-start">
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <span className="mb-0.5 flex text-white self-start font-semibold text-lg items-start">
+             eslint-disable-next-line jsx-a11y/anchor-is-valid 
             <a className="font-medium text-lg underline-offset underline pr-0.5">
               이메일과 비밀번호를
             </a>
             입력해주세요.
           </span>
           <Input
-            className="py-1 pt-2"
+            className="py-1 pt-2 text-white"
             label="이메일"
             radius="none"
             size="md"
@@ -329,7 +361,7 @@ const HelloApp = () => {
             onChange={handleEmailChange}
           />
           <Input
-            className="py-1 pt-2"
+            className="py-1 pt-2 text-white"
             label="비밀번호"
             radius="none"
             size="md"
@@ -338,17 +370,72 @@ const HelloApp = () => {
             variant="bordered"
             onChange={handlePasswordChange}
           />
-          {/* 마지막, 가입완료 처리버튼 */}
-          <Button
+           마지막, 가입완료 처리버튼 
+           <Button
             className="fixed bottom-3 w-[calc(100%-3rem)]"
             isDisabled={disableButton}
             radius="none"
             onPress={handleLinkAccount}
           >
             회원 가입
-          </Button>
+          </Button> 
+        </>
+      )} */}
+      <div className="absolute bottom-0">
+      {isHelloPage && (
+        <Button
+        className="flex flex-col w-40 mb-6 self-end text-white bg-black border-white"
+        size="md"
+        radius="sm"
+        onPress={() => setIsHelloPage(false)}
+      >
+        휴대폰 번호로 시작하기
+      </Button>
+      )}
+
+
+      {/* 인증단계 시작 */}
+      {!isHelloPage && !isCodeSent && (
+        <>
+        <Button
+          className="flex mt-[-2px] mb-6 w-64 justify-center static bottom-0 text-white bg-black border-red-500"
+          isDisabled={disableButton}
+          radius="sm"
+          variant={disableButton ? "bordered" : "light"}
+          type="submit"
+          onPress={handlePhoneSignIn}
+        >
+          인증 코드 받기
+        </Button>
         </>
       )}
+      
+      {/* 코드를 발송했다면, 표시 */}
+      {!isHelloPage && !isVerified && isCodeSent && (
+        <Button
+        className="flex mt-8 mb-6 w-64 justify-center static bottom-0 text-white bg-black border-red-500"
+        isDisabled={disableButton}
+        color="primary"
+        radius="sm"
+        variant={disableButton ? "bordered" : "light"}
+        onPress={handleVerifyCode}
+      >
+        인증 확인
+      </Button>
+      )}
+      {/* 전화번호 인증이 완료됬다면, 표시 */}
+      {!isHelloPage && isVerified && (
+        <Button
+        className="flex mt-8 mb-6 w-64 justify-center static bottom-0"
+        isDisabled={disableButton}
+        radius="sm"
+        onPress={handleLinkAccount}
+            >
+        회원 가입
+            </Button>
+      )}
+
+        </div>
     </div>
   );
 };
