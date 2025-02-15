@@ -156,9 +156,7 @@ const Home = () => {
     );
   };
 
-  if(!user) {
-    return <HelloApp />;
-  } else (
+  return(
     <div className="flex flex-col items-center pb-3 h-[calc(100vh-10rem)] bg-gray-300">
     {/* 앱전용 화면크기 <div className="flex flex-col items-center pb-3 h-[calc(100vh-6.5rem)] bg-gray-300"> */}
 
@@ -206,9 +204,11 @@ const Home = () => {
         {user ? 
           <div className="flex flex-col w-[24rem] h-48 items-center">
             {/* 이제 하단에 Stepper형식의 서비스 생성코드 추가필요. */}
-            <h1 className="mt-6 text-2xl font-semibold">서비스 생성</h1>
-
+            
+            <div className="mt-[5rem]">
             <CreateServiceStepper />
+            </div>
+            
 
             {/* <input
             type="text"

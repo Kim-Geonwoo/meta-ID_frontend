@@ -16,6 +16,9 @@ import {
   Radio,
 } from "@heroui/react";
 
+import Stepper, { Step } from './CreateStepper';
+import Image from 'next/image';
+
 
 
 // CreateServiceStepper 컴포넌트
@@ -138,102 +141,22 @@ export default function CreateServiceStepper() {
   };
 
   return (
+    
     <div className="w-[22rem]">
-
-      <div data-hs-stepper="">
-
-
-        <ul className="relative flex flex-row gap-x-1">
-
-          <li className="flex items-center gap-x-2 shrink basis-0 flex-1 group active" data-hs-stepper-nav-item='{
-            "index": 1
-          }'>
-            <span className="min-w-7 min-h-7 group inline-flex items-center text-xs align-middle focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-              <span className="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full group-focus:bg-gray-200 hs-stepper-active:bg-blue-600 hs-stepper-active:text-white hs-stepper-success:bg-blue-600 hs-stepper-success:text-white hs-stepper-completed:bg-teal-500 hs-stepper-completed:group-focus:bg-teal-600">
-                <span className="hs-stepper-success:hidden hs-stepper-completed:hidden">1</span>
-                <svg className="hidden shrink-0 size-3 hs-stepper-success:block hs-stepper-error:block" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
-              <span className="ms-1 text-sm font-medium text-gray-800 group-focus:text-gray-500">
-                명함이름
-              </span>
-            </span>
-            {/* <div className="w-full h-px flex-1 bg-black group-last:hidden hs-stepper-success:bg-blue-600 hs-stepper-completed:bg-teal-600"></div> */}
-          </li>
-
-
-
-          <li className="flex items-center gap-x-2 shrink basis-0 flex-1 group" data-hs-stepper-nav-item='{
-            "index": 2,
-            "isOptional": true
-          }'>
-            <span className="min-w-7 min-h-7 group inline-flex items-center text-xs align-middle focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-              <span className="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full group-focus:bg-gray-200 hs-stepper-active:bg-blue-600 hs-stepper-active:text-white hs-stepper-success:bg-blue-600 hs-stepper-success:text-white hs-stepper-completed:bg-teal-500 hs-stepper-completed:group-focus:bg-teal-600">
-                <span className="hs-stepper-success:hidden hs-stepper-completed:hidden">2</span>
-                <svg className="hidden shrink-0 size-3 hs-stepper-success:block" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
-              <span className="ms-1 text-sm font-medium text-gray-800 group-focus:text-gray-500">
-                이미지
-              </span>
-            </span>
-            {/* <div className="w-full h-px flex-1 bg-black group-last:hidden hs-stepper-success:bg-blue-600 hs-stepper-completed:bg-teal-600"></div> */}
-          </li>
-
-
-
-          <li className="flex items-center gap-x-2 shrink basis-0 flex-1 group" data-hs-stepper-nav-item='{
-            "index": 3,
-            "isOptional": true
-          }'>
-            <span className="min-w-7 min-h-7 group inline-flex items-center text-xs align-middle focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-              <span className="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full group-focus:bg-gray-200 hs-stepper-active:bg-blue-600 hs-stepper-active:text-white hs-stepper-success:bg-blue-600 hs-stepper-success:text-white hs-stepper-completed:bg-teal-500 hs-stepper-completed:group-focus:bg-teal-600">
-                <span className="hs-stepper-success:hidden hs-stepper-completed:hidden">3</span>
-                <svg className="hidden shrink-0 size-3 hs-stepper-success:block" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
-              <span className="ms-1 text-sm font-medium text-gray-800 group-focus:text-gray-500">
-                링크정보
-              </span>
-            </span>
-            {/* <div className="w-full h-px flex-1 bg-black group-last:hidden hs-stepper-success:bg-blue-600 hs-stepper-completed:bg-teal-600"></div> */}
-          </li>
-
-          <li className="flex items-center gap-x-2 shrink basis-0 flex-1 group" data-hs-stepper-nav-item='{
-            "index": 4,
-            "isOptional": false
-          }'>
-            <span className="min-w-7 min-h-7 group inline-flex items-center text-xs align-middle focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-              <span className="size-7 flex justify-center items-center shrink-0 bg-gray-100 font-medium text-gray-800 rounded-full group-focus:bg-gray-200 hs-stepper-active:bg-blue-600 hs-stepper-active:text-white hs-stepper-success:bg-blue-600 hs-stepper-success:text-white hs-stepper-completed:bg-teal-500 hs-stepper-completed:group-focus:bg-teal-600">
-                <span className="hs-stepper-success:hidden hs-stepper-completed:hidden">4</span>
-                <svg className="hidden shrink-0 size-3 hs-stepper-success:block" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
-              <span className="ms-1 text-sm font-medium text-gray-800 group-focus:text-gray-500">
-                연락처
-              </span>
-            </span>
-            {/* <div className="w-full h-px flex-1 bg-black group-last:hidden hs-stepper-success:bg-blue-600 hs-stepper-completed:bg-teal-600"></div> */}
-          </li>
-
-        </ul>
-
-
-
-
-
-        <div className="mt-5 sm:mt-8">
-
-          <div data-hs-stepper-content-item='{
-            "index": 1
-          }' style={{ display: 'none' }}>
-            <div className="p-4 h-48 bg-slate-500 flex justify-center items-center border border-gray-200 rounded-xl">
-              <h3 className="text-gray-500">
-                <div className="">
+      
+  
+  <Stepper
+    initialStep={1}
+    onStepChange={(step) => {
+      console.log(step);
+      
+    }}
+    onFinalStepCompleted={handleSaveService}
+    backButtonText="이전"
+    nextButtonText="다음"
+  >
+    <Step>
+    <div className="">
                   <input
                     type="text"
                     value={serviceName}
@@ -251,97 +174,73 @@ export default function CreateServiceStepper() {
                     onChange={(e) => setServiceDescription(e.target.value)}
                   />
                 </div>
-              </h3>
-            </div>
-          </div>
-
-
-
-          <div data-hs-stepper-content-item='{
-            "index": 2
-          }' style={{ display: 'none' }}>
-            <div className="p-4 h-48 bg-slate-500 flex justify-center items-center border border-gray-200 rounded-xl">
-              <h3 className="text-gray-500">
-                <div className="flex flex-col gap-y-1.5">
-                  <form>
-                    <label htmlFor="profile_img"
-                      className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                      file:bg-gray-50 file:border-0
-                      file:me-4
-                      file:py-1.5 file:px-2">
-                      프로필이미지</label>
-                    <input
-                    type="file"
-                    accept="image/*"
-                    id="profile_img"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleImageChange(e, 'profile')}
-                    />
-                  </form>
-                  <form>
-                    <label htmlFor="carousel1_img"
-                      className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                      file:bg-gray-50 file:border-0
-                      file:me-4
-                      file:py-1.5 file:px-2">
-                      슬라이드 이미지 1</label>
-                    <input
-                    type="file"
-                    accept="image/*"
-                    id="carousel1_img"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleImageChange(e, 'carousel1')}
-                    />
-                  </form>
-                  <form>
-                    <label htmlFor="carousel2_img"
-                      className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                      file:bg-gray-50 file:border-0
-                      file:me-4
-                      file:py-1.5 file:px-2">
-                      슬라이드 이미지 2</label>
-                    <input
-                    type="file"
-                    id="carousel2_img"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleImageChange(e, 'carousel2')}
-                    />
-                  </form>
-                  <form>
-                    <label htmlFor="carousel3_img"
-                      className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                      file:bg-gray-50 file:border-0
-                      file:me-4
-                      file:py-1.5 file:px-2">
-                      슬라이드 이미지 3</label>
-                    <input
-                    type="file"
-                    accept="image/*"
-                    id="carousel3_img"
-                    style={{ display: "none" }}
-                    onChange={(e) => handleImageChange(e, 'carousel3')}
-                    />
-                  </form>
-                </div>
-                {/* 이전버전의 이미지 input코드 <div>
-                  <label>캐러셀 이미지 3:</label>
-                  <input
-                  type="file"
-                  accept="image/*"
-                  className="text-black"
-                  onChange={(e) => handleImageChange(e, 'carousel3')} />
-                </div> */}
-              </h3>
-            </div>
-          </div>
-
-
-
-          <div data-hs-stepper-content-item='{
-            "index": 3
-          }' style={{ display: 'none' }}>
-            <div className="p-4 h-48 bg-slate-500 flex flex-col justify-center border border-gray-200 rounded-xl">
+    </Step>
+    <Step>
+      <div className="flex flex-col gap-y-1.5">
+        <form>
+          <label htmlFor="profile_img"
+            className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+            file:bg-gray-50 file:border-0
+            file:me-4
+            file:py-1.5 file:px-2">
+            프로필이미지</label>
+          <input
+          type="file"
+          accept="image/*"
+          id="profile_img"
+          style={{ display: "none" }}
+          onChange={(e) => handleImageChange(e, 'profile')}
+          />
+        </form>
+        <form>
+          <label htmlFor="carousel1_img"
+            className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+            file:bg-gray-50 file:border-0
+            file:me-4
+            file:py-1.5 file:px-2">
+            슬라이드 이미지 1</label>
+          <input
+          type="file"
+          accept="image/*"
+          id="carousel1_img"
+          style={{ display: "none" }}
+          onChange={(e) => handleImageChange(e, 'carousel1')}
+          />
+        </form>
+        <form>
+          <label htmlFor="carousel2_img"
+            className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+            file:bg-gray-50 file:border-0
+            file:me-4
+            file:py-1.5 file:px-2">
+            슬라이드 이미지 2</label>
+          <input
+          type="file"
+          id="carousel2_img"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={(e) => handleImageChange(e, 'carousel2')}
+          />
+        </form>
+        <form>
+          <label htmlFor="carousel3_img"
+            className="block w-full bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+            file:bg-gray-50 file:border-0
+            file:me-4
+            file:py-1.5 file:px-2">
+            슬라이드 이미지 3</label>
+          <input
+          type="file"
+          accept="image/*"
+          id="carousel3_img"
+          style={{ display: "none" }}
+          onChange={(e) => handleImageChange(e, 'carousel3')}
+          />
+        </form>
+      </div>
+    </Step>
+    <Step>
+    
               <div>
                 <div className="flex flex-col mb-2">
                 <div>
@@ -630,11 +529,6 @@ export default function CreateServiceStepper() {
                   </div>
                 ))}
               </div>
-              </div>
-              
-
-              
-
             </div>
             <div className="flex justify-end gap-x-1">
                 <button
@@ -644,15 +538,12 @@ export default function CreateServiceStepper() {
                 className="block w-18 mb-1 px-2 py-1 bg-white text-black border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                 onClick={() => handleAddLinkItem('description')}>설명 추가</button>
               </div>
-            </div>
           </div>
-
-
-          <div data-hs-stepper-content-item='{
-            "index": 4
-          }' style={{ display: 'none' }}>
-            <div className="p-4 h-48 bg-slate-500 flex justify-center items-center border border-gray-200 rounded-xl">
-              <div>
+        
+      
+    </Step>
+    <Step>
+    <div>
                 <input
                   type="text"
                   placeholder="주소"
@@ -708,55 +599,8 @@ export default function CreateServiceStepper() {
                   onChange={(e) => setContact({ ...contact, url: e.target.value })}
                 />
               </div>
-            </div>
-          </div>
-
-
-
-          <div data-hs-stepper-content-item='{
-            "isFinal": true
-          }'>
-            <div className="p-4 h-48 bg-slate-500 flex justify-center items-center border border-gray-200 rounded-xl">
-              <h3 className="text-gray-500">
-                명함 생성완료!
-              </h3>
-            </div>
-          </div>
-
-
-
-
-          <div className="mt-5 flex justify-between items-center gap-x-2">
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-stepper-back-btn="">
-              <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m15 18-6-6 6-6"></path>
-              </svg>
-              이전
-            </button>
-            {/* 건너뛰기 미사용 <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" data-hs-stepper-skip-btn="" style={{ display: 'none' }}>
-              건너뛰기
-            </button> */}
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" data-hs-stepper-next-btn="">
-              다음
-              <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
-            </button>
-            <button
-            type="button"
-            onClick={handleSaveService}
-            disabled={loading}
-            className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" data-hs-stepper-finish-btn=""
-            style={{ display: 'none' }}>
-              {loading ? '생성 중...' : '명함생성'}
-            </button>
-            <button type="reset" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" data-hs-stepper-reset-btn="" style={{ display: 'none' }}>
-              다시 만들기
-            </button>
-          </div>
-        </div>
-
-      </div>
+    </Step>
+  </Stepper>
 
     </div>
   );

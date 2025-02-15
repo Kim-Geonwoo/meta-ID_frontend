@@ -9,6 +9,9 @@ import type { AppProps } from 'next/app';
 // 리캡챠 표시 제거
 import "../styles/helloapp.css";
 
+// Stepper 스타일 추가
+import "../styles/stepper.css";
+
 import Layout from '../components/Layout';
 import {HeroUIProvider} from '@heroui/react'
 import PrelineScript from '../components/PrelineScript';
