@@ -82,7 +82,7 @@ export default function CreateServiceStepper() {
 
   const handleSaveService = async () => {
     if (!serviceName || !serviceDescription) {
-      alert('서비스 이름과 설명을 입력해주세요.');
+      alert('명함 이름과 메모를 입력해주세요.');
       return;
     }
 
@@ -125,10 +125,10 @@ export default function CreateServiceStepper() {
           { fileName: 'carousel_3.webp', fileContent: imagesToSend.carousel3 }
         ]
       });
-      alert('서비스가 저장되었습니다.');
+      alert('명함이 생성되었어요!');
     } catch (error) {
       console.error('Error saving service:', error);
-      alert('서비스 저장에 실패했습니다.');
+      alert('명함생성에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -156,7 +156,7 @@ export default function CreateServiceStepper() {
             <input
               type="text"
               value={serviceName}
-              placeholder="서비스 이름"
+              placeholder="명함 이름"
               className="mb-3 py-1.5 px-2 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
               onChange={(e) => setServiceName(e.target.value)}
             />
@@ -164,7 +164,7 @@ export default function CreateServiceStepper() {
           <div>
             <textarea
               value={serviceDescription}
-              placeholder="서비스 이름"
+              placeholder="간단한 메모"
               className="py-1.5 px-2 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
               onChange={(e) => setServiceDescription(e.target.value)}
             />

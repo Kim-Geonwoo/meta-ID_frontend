@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { encrypt } from '../pages/lib/crypto';
 import { auth } from '../pages/lib/firebaseClient';
+import { Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 
 interface EditServiceImgProps {
   shortUrl: string;
@@ -12,6 +13,8 @@ const EditServiceImg: React.FC<EditServiceImgProps> = ({ shortUrl }) => {
   const [newImages, setNewImages] = useState<(File | null)[]>([null, null, null, null]);
   const [showImageModal, setShowImageModal] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
   const user = auth.currentUser;
 
@@ -35,6 +38,7 @@ const EditServiceImg: React.FC<EditServiceImgProps> = ({ shortUrl }) => {
       const newImagesCopy = [...newImages];
       newImagesCopy[index] = e.target.files[0];
       setNewImages(newImagesCopy);
+      setHasChanges(true);
 
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -60,6 +64,7 @@ const EditServiceImg: React.FC<EditServiceImgProps> = ({ shortUrl }) => {
         setMessage('이미지 저장을 완료하였습니다.');
         fetchImages();
         setShowImageModal(false);
+        setHasChanges(false);
       } else {
         const data = await response.json();
         setMessage(`이미지 저장 중 에러: ${data.message}`);
@@ -74,37 +79,77 @@ const EditServiceImg: React.FC<EditServiceImgProps> = ({ shortUrl }) => {
     newImagesCopy[index] = null;
     setNewImages(newImagesCopy);
     fetchImages();
+    setHasChanges(false);
 
     if (fileInputRefs.current[index]) {
       fileInputRefs.current[index].value = '';
     }
   };
 
+  const handleNextImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+  };
+
+  const getImageLabel = (index: number) => {
+    switch (index) {
+      case 0:
+        return '슬라이드 이미지 첫번째';
+      case 1:
+        return '슬라이드 이미지 두번째';
+      case 2:
+        return '슬라이드 이미지 세번째';
+      case 3:
+        return '프로필 이미지';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div>
       {message && <div>{message}</div>}
-      <button onClick={() => { setShowImageModal(true); fetchImages(); }}>이미지 수정</button>
+      <Button
+        onPress={() => { setShowImageModal(true); fetchImages(); }}
+        size="md"
+        className="mt-2 w-24 bg-white border border-blue-500 text-slate-800"
+      >
+        이미지 수정
+      </Button>
       {showImageModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setShowImageModal(false)}>&times;</span>
-            {images.map((image, index) => (
-              <div key={index} style={{ marginBottom: '20px' }}>
-                <Image src={image} alt={`Service Image ${index + 1}`} layout="responsive" width={500} height={300} />
-                <input
+        <Modal isOpen={showImageModal} onClose={() => setShowImageModal(false)}>
+          <ModalContent>
+            <ModalHeader className="bg-gray-300">
+              <h1 className="font-semibold text-2xl text-slate-800">이미지 수정하기</h1>
+            </ModalHeader>
+            <ModalBody className="bg-gray-50">
+              <div className="mb-1">
+                <span className="font-medium mb-0.5">| {getImageLabel(currentIndex)}</span>
+                <Image src={images[currentIndex]} alt={`Service Image ${currentIndex + 1}`} layout="responsive" width={500} height={300} />
+                <Input
+                  className="mt-2 border rounded-md border-gray-400"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => handleImageChange(index, e)}
+                  onChange={(e) => handleImageChange(currentIndex, e)}
                   ref={(el) => {
-                    fileInputRefs.current[index] = el;
+                    fileInputRefs.current[currentIndex] = el;
                   }}
                 />
-                <button onClick={() => handleImageSave(index)}>이미지 저장</button>
-                <button onClick={() => handleImageCancel(index)}>취소</button>
+                <div className="flex justify-between mt-3">
+                  <Button onPress={handlePrevImage}>이전</Button>
+                  <Button onPress={handleNextImage}>다음</Button>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </ModalBody>
+            <ModalFooter className="bg-gray-300 flex justify-between">
+                <Button color="danger" onPress={() => handleImageCancel(currentIndex)} isDisabled={!hasChanges}>변경취소</Button>
+                <Button color="primary" onPress={() => handleImageSave(currentIndex)} isDisabled={!hasChanges}>이미지 저장</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </div>
   );
