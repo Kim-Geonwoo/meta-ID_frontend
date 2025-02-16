@@ -90,11 +90,11 @@ const MyServices = () => {
           <p>아직 서비스가 없습니다</p>
         </div>
       ) : (
-        <div className="">
+        <div className="bg-slate-300 px-2 py-1.5 border border-slate-400 rounded-md">
           <ul>
             {services.map((service) => (
               <li key={service.shortUrl}>
-                <h2>{service.name}</h2>
+                <h2 className="font-semibold">{service.name}</h2>
                 <p>{service.description}</p>
                 <p>{service.shortUrl}</p>
                 <p>{new Date(service.createdAt).toLocaleString()}</p>

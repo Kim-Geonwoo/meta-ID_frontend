@@ -23,6 +23,8 @@ import 'remixicon/fonts/remixicon.css'
 
 // IBM Plex Sans KR 폰트 추가
 import { IBM_Plex_Sans_KR } from 'next/font/google';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const ibmPlexSansKR = IBM_Plex_Sans_KR({
   subsets: ['latin'],
@@ -52,9 +54,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <HeroUIProvider>
       <Layout>
         <PrelineScript />
+        <DndProvider backend={HTML5Backend}>
         <div className={ibmPlexSansKR.className}>
           <Component {...pageProps} user={user} />
         </div>
+        </DndProvider>
       </Layout>
     </HeroUIProvider>
   )

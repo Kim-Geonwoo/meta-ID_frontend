@@ -1,25 +1,114 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { auth } from '../pages/lib/firebaseClient';
 import { encrypt } from '../pages/lib/crypto';
-import Sortable from 'sortablejs';
 import EditServiceImg from './EditServiceImg';
+import ChangeIcon from './ChangeIcon';
+import { Input } from "@heroui/react";
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
-// 타입 정의
 interface JsonItem {
   id: string;
   title: string;
-  [key: string]: any;
+  icon?: string;
+  link?: string;
+  content?: string;
+  type: string;
 }
 
 interface JsonData {
   items: JsonItem[];
-  [key: string]: any;
 }
 
 interface EditServiceProps {
   shortUrl: string;
 }
+
+// 드래그 가능한 아이템 컴포넌트
+interface DraggableItemProps {
+  item: JsonItem;
+  index: number;
+  moveItem: (dragIndex: number, hoverIndex: number) => void;
+  handleInputChange: (index: number, field: string, value: string) => void;
+  handleDeleteItem: (index: number) => void;
+}
+const DraggableItem: React.FC<DraggableItemProps> = ({ item, index, moveItem, handleInputChange, handleDeleteItem }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [{ isDragging }, drag] = useDrag({
+    type: 'ITEM',
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+  const [, drop] = useDrop({
+    accept: 'ITEM',
+    hover: (dragged: { index: number }) => {
+      if (dragged.index !== index) {
+        moveItem(dragged.index, index);
+        dragged.index = index;
+      }
+    },
+  });
+  drag(drop(ref));
+
+  return (
+    <div
+      ref={ref}
+      style={{ opacity: isDragging ? 0.5 : 1, cursor: 'move', display: 'flex', alignItems: 'center' }}
+      data-id={item.id}
+    >
+      
+      {item.type === 'description' ? (
+        <>
+        
+        <Input
+        type="text"
+        value={item.title}
+        onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+        placeholder="제목"
+        size="sm"
+        className="w-[4rem] mr-0.5 h-8"
+      />
+        <textarea
+          value={item.content}
+          onChange={(e) => handleInputChange(index, 'content', e.target.value)}
+          placeholder="내용"
+          className=""
+        />
+        </>
+      ) : (
+        <>
+          <Input
+            type="text"
+            value={item.title}
+            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+            placeholder="링크"
+            size="sm"
+            className="w-[4rem] mr-0.5 h-8"
+          />
+          <ChangeIcon
+            selectedIcon={item.icon}
+            onIconSelect={(icon) => handleInputChange(index, 'icon', icon)}
+          />
+          <Input
+            type="text"
+            value={item.link}
+            onChange={(e) => handleInputChange(index, 'link', e.target.value)}
+            placeholder="Link"
+            size="sm"
+            className="w-[10rem] ml-0.5 h-8"
+          />
+        </>
+      )}
+      <button onClick={() => handleDeleteItem(index)} style={{ marginLeft: '10px' }}>
+        삭제
+      </button>
+      <span className="drag-handle" style={{ cursor: 'grab', marginLeft: 'auto' }}>☰</span>
+    </div>
+  );
+};
 
 const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +123,7 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   const [activeTab, setActiveTab] = useState<string>('data');
   const [hasChanges, setHasChanges] = useState<boolean>(false);
   const user = auth.currentUser;
-  const sortableRef = useRef<HTMLDivElement>(null);
+  const [itemCounter, setItemCounter] = useState<number>(0);
 
   const fetchData = useCallback(async () => {
     try {
@@ -76,48 +165,16 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     };
   }, [fetchData, shortUrl]);
 
-  const setupSortable = useCallback(() => {
-    if (sortableRef.current && jsonData?.items) {
-      Sortable.create(sortableRef.current, {
-        animation: 150,
-        handle: '.drag-handle',
-        onStart: () => {
-          const storedJsonData = localStorage.getItem(`jsonData_${shortUrl}`);
-          if (storedJsonData) {
-            setJsonData(JSON.parse(storedJsonData));
-          }
-        },
-        onEnd: (evt) => {
-          const items = [...jsonData.items];
-          const [movedItem] = items.splice(evt.oldIndex, 1);
-          items.splice(evt.newIndex, 0, movedItem);
-          const updatedItems = Array.from(sortableRef.current.children).map((child: any) => {
-            const id = child.getAttribute('data-id');
-            const title = child.querySelector('input[type="text"]').value;
-            const content = child.querySelector('textarea')?.value.split('\n') || [];
-            const icon = child.querySelector('input[placeholder="Icon"]')?.value || '';
-            const link = child.querySelector('input[placeholder="Link"]')?.value || '';
-            const type = jsonData.items.find(item => item.id === id)?.type;
-            if (type === 'description') {
-              return { id, title, content, type };
-            } else {
-              return { id, title, content, icon, link, type };
-            }
-          });
-          const finalJsonData = { ...jsonData, items: updatedItems };
-          setJsonData(finalJsonData);
-          localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(finalJsonData));
-          setHasChanges(true);
-        },
-      });
-    }
-  }, [jsonData, setJsonData, shortUrl]);
-
-  useEffect(() => {
-    if (activeTab === 'data') {
-      setupSortable();
-    }
-  }, [setupSortable, activeTab]);
+  const moveItem = (from: number, to: number) => {
+    const items = [...jsonData.items];
+    const [removed] = items.splice(from, 1);
+    items.splice(to, 0, removed);
+    const reIndexedItems = items.map((item, index) => ({ ...item, id: index.toString() }));
+    const updatedJsonData = { ...jsonData, items: reIndexedItems };
+    setJsonData(updatedJsonData);
+    localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(updatedJsonData));
+    setHasChanges(true);
+  };
 
   const handleInputChange = (index: number, field: string, value: string) => {
     const newItems = [...jsonData.items];
@@ -132,6 +189,34 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
     const updatedContactData = { ...contactData, [field]: value };
     setContactData(updatedContactData);
     localStorage.setItem(`contactData_${shortUrl}`, JSON.stringify(updatedContactData));
+    setHasChanges(true);
+  };
+
+  const handleAddItem = (type: string) => {
+    let newItem: JsonItem;
+    if (type === 'link') {
+      newItem = { id: '', title: '', icon: '', link: '', type };
+    } else if (type === 'description') {
+      newItem = { id: '', title: '', content: '', type };
+    } else {
+      newItem = { id: '', title: '', type };
+    }
+  
+    const updatedItems = [...(jsonData?.items || []), newItem];
+    const reIndexedItems = updatedItems.map((item, index) => ({ ...item, id: index.toString() }));
+    const updatedJsonData = { ...(jsonData || { items: [] }), items: reIndexedItems };
+    setJsonData(updatedJsonData);
+    localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(updatedJsonData));
+    setHasChanges(true);
+  };
+  
+  const handleDeleteItem = (index: number) => {
+    const updatedItems = [...jsonData.items];
+    updatedItems.splice(index, 1);
+    const reIndexedItems = updatedItems.map((item, index) => ({ ...item, id: index.toString() }));
+    const updatedJsonData = { ...jsonData, items: reIndexedItems };
+    setJsonData(updatedJsonData);
+    localStorage.setItem(`jsonData_${shortUrl}`, JSON.stringify(updatedJsonData));
     setHasChanges(true);
   };
 
@@ -192,113 +277,26 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
       </div>
       {activeTab === 'data' ? (
         <>
-          <div ref={sortableRef} style={{ marginTop: '20px' }}>
+          <div style={{ marginBottom: '10px' }}>
+            <button onClick={() => handleAddItem('link')}>링크 아이템 추가</button>
+            <button onClick={() => handleAddItem('description')}>설명 아이템 추가</button>
+          </div>
+          <div className="flex flex-col space-y-1 my-1">
             {jsonData?.items.map((item, index) => (
-              <div key={item.id}
-              data-id={item.id}
-              className="">
-                <input
-                  type="text"
-                  value={item.title}
-                  onChange={(e) => handleInputChange(index, 'title', e.target.value)}
-                  placeholder="Title"
-                  style={{ marginRight: '10px' }}
-                />
-                {item.type === 'description' ? (
-                  <textarea
-                    value={item.content}
-                    onChange={(e) => handleInputChange(index, 'content', e.target.value)}
-                    placeholder="Content"
-                    style={{ marginRight: '10px' }}
-                  />
-                ) : (
-                  <>
-                    <input
-                      type="text"
-                      value={item.icon}
-                      onChange={(e) => handleInputChange(index, 'icon', e.target.value)}
-                      placeholder="Icon"
-                      style={{ marginRight: '10px' }}
-                    />
-                    <input
-                      type="text"
-                      value={item.link}
-                      onChange={(e) => handleInputChange(index, 'link', e.target.value)}
-                      placeholder="Link"
-                      style={{ marginRight: '10px' }}
-                    />
-                  </>
-                )}
-                <span className="drag-handle" style={{ cursor: 'grab', marginLeft: 'auto' }}>☰</span>
-              </div>
+              <DraggableItem 
+                key={item.id}
+                item={item}
+                index={index}
+                moveItem={moveItem}
+                handleInputChange={handleInputChange}
+                handleDeleteItem={handleDeleteItem}
+              />
             ))}
           </div>
         </>
       ) : (
         <div>
-          <input
-            type="text"
-            value={contactData?.fn || ''}
-            onChange={(e) => handleContactChange('fn', e.target.value)}
-            placeholder="Full Name"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.birthday || ''}
-            onChange={(e) => handleContactChange('birthday', e.target.value)}
-            placeholder="Birthday"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.tel || ''}
-            onChange={(e) => handleContactChange('tel', e.target.value)}
-            placeholder="Tel"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.address || ''}
-            onChange={(e) => handleContactChange('address', e.target.value)}
-            placeholder="Address"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.company || ''}
-            onChange={(e) => handleContactChange('company', e.target.value)}
-            placeholder="Company"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.position || ''}
-            onChange={(e) => handleContactChange('position', e.target.value)}
-            placeholder="Position"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.email?.home || ''}
-            onChange={(e) => handleContactChange('email.home', e.target.value)}
-            placeholder="Home Email"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.email?.work || ''}
-            onChange={(e) => handleContactChange('email.work', e.target.value)}
-            placeholder="Work Email"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
-          <input
-            type="text"
-            value={contactData?.url || ''}
-            onChange={(e) => handleContactChange('url', e.target.value)}
-            placeholder="URL"
-            style={{ marginBottom: '10px', width: '100%' }}
-          />
+          {/* Contact form */}
         </div>
       )}
       <button onClick={handleSave} disabled={saveLoading || cancelLoading}>
