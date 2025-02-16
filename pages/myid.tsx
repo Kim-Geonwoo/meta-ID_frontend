@@ -97,12 +97,13 @@ const MyServices = () => {
                 <h2 className="font-semibold">{service.name}</h2>
                 <p>{service.description}</p>
                 <p>{service.shortUrl}</p>
-                <p>{new Date(service.createdAt).toLocaleString()}</p>
+                <EditServiceImg shortUrl={service.shortUrl} />
                 <button onClick={() => !loading && confirmDeleteService(service._id, service.shortUrl)} disabled={loading}>
                   {loading ? '삭제 중...' : '삭제'}
                 </button>
                 <EditService shortUrl={service.shortUrl} />
-                <EditServiceImg shortUrl={service.shortUrl} />
+                <hr className="w-full border-t border-black" />
+                <div className="pt-1 pb-0.5">명함 생성일 : <a className="font-medium"> {new Date(service.createdAt).toLocaleString()}</a></div>
               </li>
             ))}
           </ul>

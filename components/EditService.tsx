@@ -4,8 +4,8 @@ import { auth } from '../pages/lib/firebaseClient';
 import { encrypt } from '../pages/lib/crypto';
 import EditServiceImg from './EditServiceImg';
 import ChangeIcon from './ChangeIcon';
-import { Input } from "@heroui/react";
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { Button, Input, Tab, Tabs } from "@heroui/react";
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface JsonItem {
@@ -59,24 +59,22 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, index, moveItem, ha
       style={{ opacity: isDragging ? 0.5 : 1, cursor: 'move', display: 'flex', alignItems: 'center' }}
       data-id={item.id}
     >
-      
       {item.type === 'description' ? (
         <>
-        
-        <Input
-        type="text"
-        value={item.title}
-        onChange={(e) => handleInputChange(index, 'title', e.target.value)}
-        placeholder="제목"
-        size="sm"
-        className="w-[4rem] mr-0.5 h-8"
-      />
-        <textarea
-          value={item.content}
-          onChange={(e) => handleInputChange(index, 'content', e.target.value)}
-          placeholder="내용"
-          className=""
-        />
+          <Input
+            type="text"
+            value={item.title}
+            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+            placeholder="제목"
+            size="sm"
+            className="w-[4rem] mr-0.5 h-8"
+          />
+          <textarea
+            value={item.content}
+            onChange={(e) => handleInputChange(index, 'content', e.target.value)}
+            placeholder="내용"
+            className=""
+          />
         </>
       ) : (
         <>
@@ -119,11 +117,10 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   const [jsonData, setJsonData] = useState<JsonData | null>(null);
   const [contactData, setContactData] = useState<any | null>(null);
   const [initialJsonData, setInitialJsonData] = useState<JsonData | null>(null);
-  const [initialContactData, setInitialContactData] = useState<any | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('data');
   const [hasChanges, setHasChanges] = useState<boolean>(false);
+  const [initialContactData, setInitialContactData] = useState<any | null>(null);
+  const [selected, setSelected] = useState<string>('data');
   const user = auth.currentUser;
-  const [itemCounter, setItemCounter] = useState<number>(0);
 
   const fetchData = useCallback(async () => {
     try {
@@ -271,40 +268,105 @@ const EditService: React.FC<EditServiceProps> = ({ shortUrl }) => {
   return (
     <div>
       {message && <div>{message}</div>}
-      <div>
-        <button onClick={() => setActiveTab('data')} disabled={activeTab === 'data'}>Data</button>
-        <button onClick={() => setActiveTab('contact')} disabled={activeTab === 'contact'}>Contact</button>
+      <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={(key) => setSelected(key as string)}>
+        <Tab key="data" title="Data">
+          <>
+            <div className="flex flex-row justify-end space-x-1 my-1">
+              <Button color="primary" size="sm" onPress={() => handleAddItem('link')}>링크추가</Button>
+              <Button color="primary" size="sm" onPress={() => handleAddItem('description')}>설명추가</Button>
+            </div>
+            <DndProvider backend={HTML5Backend}>
+              <div className="flex flex-col space-y-1 my-1">
+                {jsonData?.items.map((item, index) => (
+                  <DraggableItem 
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    moveItem={moveItem}
+                    handleInputChange={handleInputChange}
+                    handleDeleteItem={handleDeleteItem}
+                  />
+                ))}
+              </div>
+            </DndProvider>
+          </>
+        </Tab>
+        <Tab key="contact" title="Contact">
+          <div className="flex flex-col">
+            <input
+              type="text"
+              value={contactData?.fn || ''}
+              onChange={(e) => handleContactChange('fn', e.target.value)}
+              placeholder="Full Name"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.birthday || ''}
+              onChange={(e) => handleContactChange('birthday', e.target.value)}
+              placeholder="Birthday"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.tel || ''}
+              onChange={(e) => handleContactChange('tel', e.target.value)}
+              placeholder="Tel"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.address || ''}
+              onChange={(e) => handleContactChange('address', e.target.value)}
+              placeholder="Address"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.company || ''}
+              onChange={(e) => handleContactChange('company', e.target.value)}
+              placeholder="Company"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.position || ''}
+              onChange={(e) => handleContactChange('position', e.target.value)}
+              placeholder="Position"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.email?.home || ''}
+              onChange={(e) => handleContactChange('email.home', e.target.value)}
+              placeholder="Home Email"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.email?.work || ''}
+              onChange={(e) => handleContactChange('email.work', e.target.value)}
+              placeholder="Work Email"
+              className="mb-2 w-64"
+            />
+            <input
+              type="text"
+              value={contactData?.url || ''}
+              onChange={(e) => handleContactChange('url', e.target.value)}
+              placeholder="URL"
+              className="mb-2 w-64"
+            />
+          </div>
+        </Tab>
+      </Tabs>
+      <div className="mt-2 mb-1 space-x-1 flex flex-row justify-end">
+        <Button color="primary" size="sm" onPress={handleSave} isDisabled={saveLoading || cancelLoading}>
+          {saveLoading ? '저장 중...' : '저장'}
+        </Button>
+        <Button color="primary" size="sm" onPress={handleCancel} isDisabled={saveLoading || cancelLoading}>
+          {cancelLoading ? '취소 중...' : '취소'}
+        </Button>
       </div>
-      {activeTab === 'data' ? (
-        <>
-          <div style={{ marginBottom: '10px' }}>
-            <button onClick={() => handleAddItem('link')}>링크 아이템 추가</button>
-            <button onClick={() => handleAddItem('description')}>설명 아이템 추가</button>
-          </div>
-          <div className="flex flex-col space-y-1 my-1">
-            {jsonData?.items.map((item, index) => (
-              <DraggableItem 
-                key={item.id}
-                item={item}
-                index={index}
-                moveItem={moveItem}
-                handleInputChange={handleInputChange}
-                handleDeleteItem={handleDeleteItem}
-              />
-            ))}
-          </div>
-        </>
-      ) : (
-        <div>
-          {/* Contact form */}
-        </div>
-      )}
-      <button onClick={handleSave} disabled={saveLoading || cancelLoading}>
-        {saveLoading ? '저장 중...' : '저장'}
-      </button>
-      <button onClick={handleCancel} disabled={saveLoading || cancelLoading}>
-        {cancelLoading ? '취소 중...' : '취소'}
-      </button>
     </div>
   );
 };
