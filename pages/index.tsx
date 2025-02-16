@@ -18,6 +18,9 @@ import Signup from '../components/Signup';
 
 
 import { HoverCard } from '../components/HoverCard';
+import { useEffect } from 'react';
+import router from 'next/router';
+import HelloApp from './helloapp';
 
 const Home = () => {
 
@@ -33,8 +36,6 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
 
   const user = useUser();
-
-
   
 
 
@@ -45,6 +46,8 @@ const Home = () => {
 
     try {
       const user = auth.currentUser;
+
+      
 
       
 
@@ -153,9 +156,8 @@ const Home = () => {
     );
   };
 
-
-  return (
-    <div className="flex flex-col items-center pb-3 h-[calc(100vh-10rem)] bg-gray-300">
+  return(
+    <div className="flex flex-col items-center h-[calc(100vh-10rem)] bg-gray-300">
     {/* 앱전용 화면크기 <div className="flex flex-col items-center pb-3 h-[calc(100vh-6.5rem)] bg-gray-300"> */}
 
       <h1 className="font-medium text-4xl text-center mt-8">간단하게 만드는</h1>
@@ -198,13 +200,16 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="w-[24rem] h-48 mt-[2rem]">
+      <div className="w-[24rem] h-48 mt-[2rem] bg-gray-300">
         {user ? 
           <div className="flex flex-col w-[24rem] h-48 items-center">
             {/* 이제 하단에 Stepper형식의 서비스 생성코드 추가필요. */}
-            <h1 className="mt-6 text-2xl font-semibold">서비스 생성</h1>
-
-            <CreateServiceStepper />
+            
+            <div className="">
+              <h2 className="text-2xl font-bold text-center mb-1">나만의 명함 만들기</h2>
+              <CreateServiceStepper />
+            </div>
+            
 
             {/* <input
             type="text"

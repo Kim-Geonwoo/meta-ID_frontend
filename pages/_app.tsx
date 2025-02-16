@@ -6,7 +6,11 @@ import { auth } from './lib/firebaseClient'; // 미사용이지만, 내버려두
 import { onAuthStateChanged } from 'firebase/auth'; // 미사용이지만, 내버려두기로 하였음.
 import type { AppProps } from 'next/app';
 
+// 리캡챠 표시 제거
+import "../styles/helloapp.css";
 
+// Stepper 스타일 추가
+import "../styles/stepper.css";
 
 import Layout from '../components/Layout';
 import {HeroUIProvider} from '@heroui/react'
@@ -19,6 +23,8 @@ import 'remixicon/fonts/remixicon.css'
 
 // IBM Plex Sans KR 폰트 추가
 import { IBM_Plex_Sans_KR } from 'next/font/google';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const ibmPlexSansKR = IBM_Plex_Sans_KR({
   subsets: ['latin'],
@@ -28,30 +34,31 @@ const ibmPlexSansKR = IBM_Plex_Sans_KR({
 
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [user, setUser] = useState<any>(null); // SetUser는 미사용이지만, 내버려두기로 하였음.
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    /*
-    // Listen for changes to auth state (logged in, signed out, etc.)
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+  //     setUser(currentUser);
 
-      if (!currentUser) {
-        router.push('/login');
-      }
-    });
+  //     if (!currentUser) {
+  //       router.replace('/helloapp');
+  //     }
+  //   });
 
-    return () => unsubscribe(); */ // 미사용이지만, 내버려두기로 하였음.
-  }, [router]);
+  //   return () => unsubscribe();
+  //    // 미사용이지만, 내버려두기로 하였음.
+  // }, [router]);
 
   return (
     <HeroUIProvider>
       <Layout>
         <PrelineScript />
+        <DndProvider backend={HTML5Backend}>
         <div className={ibmPlexSansKR.className}>
           <Component {...pageProps} user={user} />
         </div>
+        </DndProvider>
       </Layout>
     </HeroUIProvider>
   )

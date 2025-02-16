@@ -1,0 +1,19 @@
+{
+    "name": "메타ID",
+    "short_name": "메타ID",
+    "description": "오프라인에서 공유하는 디지털명함 - 메타ID",
+    "theme_color": "#006fee",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "form_factor": "narrow",
+    "icons": [
+        {
+        "src": "https://img-sv.geonwoo.dev/meta-id_front/icon-192-maskable.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+        }
+    ]
+}

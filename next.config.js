@@ -2,6 +2,10 @@
 
 require('dotenv').config();
 
+const withPWA = require('next-pwa')({
+  dest: 'public',
+});
+
 const nextConfig = {
     async rewrites() {
       return [
@@ -13,12 +17,9 @@ const nextConfig = {
       NEXT_PUBLIC_SUPABASE_KEY: process.env.NEXT_PUBLIC_SUPABASE_KEY,
     },
     reactStrictMode: true,
-  };
-  
-  module.exports = {
     images: {
         domains: ['img-sv.geonwoo.dev']
     },
-    reactStrictMode: true,
-    ...nextConfig
-  };
+};
+
+module.exports = withPWA(nextConfig);
